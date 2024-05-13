@@ -1,0 +1,7 @@
+.swagger-ui .topbar {
+	display: block;
+}
+
+.topbar-wrapper > .link > svg {
+	display: none;
+}

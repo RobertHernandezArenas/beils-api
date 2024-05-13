@@ -1,0 +1,4 @@
+CREATE DATABASE Beils_DB;
+USE Beils_DB;
+SELECT * FROM users;
+-- DROP DATABASE beils_db;
