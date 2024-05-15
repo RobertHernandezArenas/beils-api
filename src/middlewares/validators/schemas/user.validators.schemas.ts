@@ -14,10 +14,10 @@ export const userSchemas = {
 			'string.max': 'Surname must not have more than 30 characters',
 			'string.required': 'Surname is mandatory',
 		}),
-		telephone: Joi.string().empty().min(9).required().messages({
-			'string.empty': 'Telephone cannot be empty',
-			'string.min': 'Telephone must have at least 9 characters',
-			'string.required': 'Telephone is mandatory',
+		phone: Joi.string().empty().min(9).required().messages({
+			'string.empty': 'Phone cannot be empty',
+			'string.min': 'Phone must have at least 9 characters',
+			'string.required': 'Phone is mandatory',
 		}),
 		email: Joi.string()
 			.email()

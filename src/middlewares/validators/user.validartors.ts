@@ -4,16 +4,15 @@ import { userSchemas } from './schemas/user.validators.schemas';
 export const userValidators = {
 	create: async (request: Request, response: Response, next: NextFunction) => {
 		try {
-			const result = userSchemas.create.validate(request.body, {
-				abortEarly: false,
-			});
+			const result = userSchemas.create.validate(request.body);
 
 			if (!result.error) {
 				return next();
 			} else {
 				const validationErrors = result.error.details.map(
 					(error: { message: string }) => ({
-						errorName: error.message,
+						type: 'Validation error',
+						description: error.message,
 					}),
 				);
 
