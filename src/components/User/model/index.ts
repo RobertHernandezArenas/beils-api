@@ -1,25 +1,23 @@
-import { DataTypes, sql } from '@sequelize/core';
-import { sequelize } from '../db/sequelize';
+import { DataTypes } from '@sequelize/core';
+import { sequelize } from '../../../database/MYSQL/sequelize';
+import { adapters } from '../../../utils/adapters';
 
-export const UserModel = sequelize.define('user', {
+const userSchema = {
 	id: {
 		type: DataTypes.STRING,
 		unique: true,
-		defaultValue: sql.uuidV4,
+		defaultValue: adapters.generateID(10),
 		primaryKey: true,
 		allowNull: false,
 	},
 	name: {
 		type: DataTypes.STRING,
-		allowNull: false,
 	},
 	surname: {
 		type: DataTypes.STRING,
-		allowNull: false,
 	},
 	phone: {
 		type: DataTypes.STRING,
-		allowNull: false,
 	},
 	email: {
 		type: DataTypes.STRING,
@@ -28,25 +26,24 @@ export const UserModel = sequelize.define('user', {
 	},
 	password: {
 		type: DataTypes.STRING,
-		allowNull: false,
+
+		defaultValue: '123456',
 	},
 	country: {
 		type: DataTypes.STRING,
-		allowNull: true,
-		defaultValue: 'España',
+
+		defaultValue: 'SPAIN',
 	},
 	city: {
 		type: DataTypes.STRING,
-		allowNull: true,
-		defaultValue: 'A Coruña',
+
+		defaultValue: 'A CORUÑA',
 	},
 	zip_code: {
 		type: DataTypes.STRING,
-		allowNull: true,
 	},
 	address: {
 		type: DataTypes.STRING,
-		allowNull: true,
 	},
 	role: {
 		type: DataTypes.STRING,
@@ -55,29 +52,27 @@ export const UserModel = sequelize.define('user', {
 	},
 	type_document: {
 		type: DataTypes.STRING,
-		allowNull: true,
-		defaultValue: null,
+
+		defaultValue: 'DNI',
 	},
 	document_number: {
 		type: DataTypes.STRING,
 		unique: true,
-		allowNull: true,
 	},
 	gender: {
 		type: DataTypes.STRING,
-		allowNull: true,
-		defaultValue: 'Mujer',
+
+		defaultValue: 'FEMALE',
 	},
 	birthdate: {
 		type: DataTypes.DATE,
-		allowNull: true,
 	},
 	nickname: {
 		type: DataTypes.STRING,
-		allowNull: true,
 	},
 	avatar: {
 		type: DataTypes.STRING,
-		allowNull: true,
 	},
-});
+};
+
+export const UserModel = sequelize.define('user', userSchema);

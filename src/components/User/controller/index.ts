@@ -1,43 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserModel } from '../models/user.model';
-import { userResponses } from '../utils/messages/responses/user.responses';
-import { encrypt } from '../utils/adapters/bcrypt';
+import { UserModel } from '../model';
 import { Op, WhereOptions } from '@sequelize/core';
-import { IWhereClause } from '../utils/interfaces/users';
+import { IWhereClause, UserDTO } from '../../../utils/interfaces/user';
 
 export const UserController = {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
-			await UserModel.create({
-				name: request.body.name,
-				surname: request.body.surname,
-				phone: request.body.phone,
-				email: request.body.email,
-				password: await encrypt(
-					request.body.password ?? process.env.PASSWORD,
-					10,
-				),
-			});
-			response.status(200).json(userResponses.create);
-		} catch (error: unknown) {
-			response.status(409).json({
-				error: true,
-				message: 'REGISTER_CONFLICT',
-				data: {},
-			});
+			const user = UserDTO.create(request.body);
+			await UserModel.create({ ...user });
+			response.status(201).json();
+		} catch (error) {
 			next(error);
 		}
 	},
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { id } = request.params;
-			const userData = request.body;
-			await UserModel.update({ userData }, { where: { id } });
+			const userDatatoModify = request.body;
 
-			response.json({ message: 'OK' });
+			await UserModel.update(userDatatoModify, { where: { id } });
+
+			response.status(200).json({
+				data: 'OK',
+			});
 		} catch (error) {
-			console.error('Error al actualizar el usuario:', error);
-			response.status(500).json({ message: 'INTERNAL_SERVER_ERROR' });
 			next(error);
 		}
 	},
@@ -49,8 +35,6 @@ export const UserController = {
 
 			response.json({ message: 'OK' });
 		} catch (error) {
-			console.error('Error al actualizar el usuario:', error);
-			response.status(500).json({ message: 'INTERNAL_SERVER_ERROR' });
 			next(error);
 		}
 	},
@@ -60,7 +44,6 @@ export const UserController = {
 				data: await UserModel.findOne({}),
 			});
 		} catch (error) {
-			response.status(400).json(error);
 			next(error);
 		}
 	},
@@ -77,13 +60,11 @@ export const UserController = {
 			if (document_number)
 				where.document_number = { [Op.like]: `%${document_number}%` };
 
-			console.log(email);
 			const user = await UserModel.findAll({ where });
 			response.status(200).json({
 				data: user,
 			});
 		} catch (error) {
-			response.status(400).json(error);
 			next(error);
 		}
 	},

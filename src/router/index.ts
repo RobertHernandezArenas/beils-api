@@ -1,10 +1,10 @@
-import express from 'express';
+import { Router } from 'express';
 import swaggerUI from 'swagger-ui-express';
 // import documentation from '../../documentation/swagger.json';
 import { openAPIConfiguration } from '../docs/swagger';
-import { userRouter } from './user.routes';
+import User from '../components/User';
 
-const routes = express.Router();
+const routes = Router();
 
 const swaggerOptions = {
 	customCss: `
@@ -17,12 +17,11 @@ const swaggerOptions = {
     }
     `,
 };
-/**/
 
 export const router = routes
-	.use('/users', userRouter)
+	.use('/users', User.router)
 	.use(
-		'/documentation',
+		'/',
 		swaggerUI.serve,
 		swaggerUI.setup(openAPIConfiguration, swaggerOptions),
 	);
