@@ -11,6 +11,11 @@ userRouter
 		userMiddleware.validateDataBody,
 		UserController.create,
 	)
+	.post(
+		'/login',
+
+		UserController.login,
+	)
 	.get('/', UserController.findAll)
 	.get('/:id', UserController.findOne)
 	.put(

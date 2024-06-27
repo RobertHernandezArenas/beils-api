@@ -2,11 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../model';
 import { Op, WhereOptions } from '@sequelize/core';
 import { IWhereClause, UserDTO } from '../../../utils/interfaces/user';
+import { generateToken } from '../../../utils/adapters/jwt';
 
 export const UserController = {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
-			const user = UserDTO.create(request.body);
+			const user = await UserDTO.create(request.body);
 			await UserModel.create({ ...user });
 			response.status(201).json();
 		} catch (error) {
@@ -63,6 +64,38 @@ export const UserController = {
 			const user = await UserModel.findAll({ where });
 			response.status(200).json({
 				data: user,
+			});
+		} catch (error) {
+			next(error);
+		}
+	},
+
+	login: async (request: Request, response: Response, next: NextFunction) => {
+		try {
+			const { email, password } = request.body;
+
+			const user = await UserModel.findOne({ where: { email } });
+
+			if (!user) {
+				return response.status(404).json({
+					code: 404,
+					status: 'error',
+					type: 'NOT_FOUND',
+				});
+			}
+
+			if (user.dataValues.password !== password) {
+				return response.status(401).json({
+					code: 401,
+					status: 'error',
+					type: 'UNAUTHORIZED',
+				});
+			}
+
+			const token = generateToken({ user }, 'tiringuistinguis', '30s');
+			console.log(token);
+			response.status(200).header('Authorization', `Bearer ${token}`).json({
+				data: false,
 			});
 		} catch (error) {
 			next(error);

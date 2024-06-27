@@ -1,4 +1,5 @@
 import { Utils } from '../..';
+import { adapters } from '../../adapters';
 
 export interface IWhereClause {
 	email?: string | object;
@@ -48,7 +49,7 @@ export class UserDTO {
 		public avatar?: string,
 	) {}
 
-	public static create(body: IUser): UserDTO {
+	public static async create(body: IUser): Promise<UserDTO> {
 		const {
 			email,
 			name,
@@ -72,7 +73,7 @@ export class UserDTO {
 			Utils.tools.capitalizeEachFirstLetter(name ?? ''),
 			Utils.tools.capitalizeEachFirstLetter(surname ?? ''),
 			phone,
-			password ?? '123456',
+			await adapters.encrypt(password ?? '123456', 10),
 			country?.toUpperCase() ?? 'SPAIN',
 			city?.toUpperCase() ?? 'A CORUÑA',
 			zip_code,
