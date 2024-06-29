@@ -73,6 +73,13 @@ const userSchema = {
 	avatar: {
 		type: DataTypes.STRING,
 	},
+	verificationCode: {
+		type: DataTypes.INTEGER,
+	},
+	isAccountVerified: {
+		type: DataTypes.BOOLEAN,
+		defaultValue: false,
+	},
 };
 
 export const UserModel = sequelize.define('user', userSchema);

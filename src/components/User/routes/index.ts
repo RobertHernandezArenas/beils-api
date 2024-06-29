@@ -3,6 +3,10 @@ import { userMiddleware } from '../middleware';
 import { UserController } from '../controller';
 
 export const userRouter = Router();
+/**
+que se suele guardar en un token jwt para cuestiones de login , teniendo en cuenta la seguridad de la app para no comprometer ningun dato a ciberataques
+
+*/
 
 userRouter
 	.post(
@@ -11,13 +15,10 @@ userRouter
 		userMiddleware.validateDataBody,
 		UserController.create,
 	)
-	.post(
-		'/login',
-
-		UserController.login,
-	)
+	.post('/login', UserController.login)
+	.post('/forgot-password', UserController.forgotPassword)
 	.get('/', UserController.findAll)
-	.get('/:id', UserController.findOne)
+	.get('/:id', userMiddleware.validateRole, UserController.findOne)
 	.put(
 		'/:id',
 		userMiddleware.validateUserByID,

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { userSchema } from '../schema';
 import User from '../index';
+import { verifyToken } from '../../../utils/adapters/jwt';
 
 export const userMiddleware = {
 	validateDataBody: async (
@@ -68,11 +69,11 @@ export const userMiddleware = {
 			next(error);
 		}
 	},
-	async validateDataToModify(
+	validateDataToModify: async (
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) {
+	) => {
 		try {
 			const { id } = request.params;
 			const email = await User.model
@@ -86,6 +87,36 @@ export const userMiddleware = {
 					.status(400)
 					.json({ code: 409, status: 'error', type: 'CONFLICT' });
 			}
+			next();
+		} catch (error) {
+			next(error);
+		}
+	},
+	validateRole: async (
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) => {
+		try {
+			console.log(' AUTHORIZATION::::>', request.headers.authorization);
+			const { authorization } = request.headers;
+
+			if (!authorization) {
+				console.log('1 if:::>');
+				return response
+					.status(401)
+					.send({ code: 401, status: 'error', type: 'UNAUTHORIZED' });
+			}
+
+			const { user } = verifyToken(
+				authorization.toString().split(' ')[1],
+				'tiringuistinguis',
+			);
+
+			console.log('ROLE:::>', user.role);
+			/*
+			
+			*/
 			next();
 		} catch (error) {
 			next(error);

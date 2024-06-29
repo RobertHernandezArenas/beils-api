@@ -1,12 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../model';
 import { Op, WhereOptions } from '@sequelize/core';
-import { IWhereClause, UserDTO } from '../../../utils/interfaces/user';
+import { IWhereClause } from '../../../utils/interfaces/user';
 import { generateToken } from '../../../utils/adapters/jwt';
+import { UserDTO } from '../dto';
+import { Utils } from '../../../utils';
+import { config } from '../../../config';
 
 export const UserController = {
+	// TODO: Pending to create email component for sending verificationCode
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
+			console.log('PASSWORD:::>', request.body?.password);
 			const user = await UserDTO.create(request.body);
 			await UserModel.create({ ...user });
 			response.status(201).json();
@@ -17,7 +22,7 @@ export const UserController = {
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { id } = request.params;
-			const userDatatoModify = request.body;
+			const userDatatoModify = await UserDTO.create(request.body);
 
 			await UserModel.update(userDatatoModify, { where: { id } });
 
@@ -84,7 +89,12 @@ export const UserController = {
 				});
 			}
 
-			if (user.dataValues.password !== password) {
+			const passwordMatch = await Utils.adapters.encryptCompare(
+				password,
+				user.dataValues.password,
+			);
+
+			if (!passwordMatch) {
 				return response.status(401).json({
 					code: 401,
 					status: 'error',
@@ -92,10 +102,63 @@ export const UserController = {
 				});
 			}
 
-			const token = generateToken({ user }, 'tiringuistinguis', '30s');
-			console.log(token);
+			const token = generateToken(
+				{ user },
+				config.jwt.secretKey,
+				config.jwt.expiredIn,
+			);
+
 			response.status(200).header('Authorization', `Bearer ${token}`).json({
 				data: false,
+			});
+		} catch (error) {
+			next(error);
+		}
+	},
+	// TODO: Pending to create email component
+	forgotPassword: async (
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) => {
+		try {
+			response.status(200).json({
+				data: 'OK',
+			});
+		} catch (error) {
+			next(error);
+		}
+	},
+	activateAccount: async (
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) => {
+		try {
+			response.status(200).json({
+				data: 'OK',
+			});
+		} catch (error) {
+			next(error);
+		}
+	},
+	deactivateAccount: async (
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) => {
+		try {
+			const { email } = request.body;
+			const user = await UserModel.findOne({ where: { email } });
+			if (!user) {
+				return response.status(404).json({
+					code: 404,
+					status: 'error',
+					type: 'NOT_FOUND',
+				});
+			}
+			response.status(200).json({
+				data: 'OK',
 			});
 		} catch (error) {
 			next(error);

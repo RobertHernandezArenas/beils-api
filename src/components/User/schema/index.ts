@@ -34,14 +34,20 @@ export const userSchema = Joi.object().keys({
 	gender: Joi.string().valid('Hombre', 'Mujer').messages({
 		'string.valid': 'Gender must be either Hombre or Mujer',
 	}),
-	password: Joi.string().optional().min(6),
-	country: Joi.string().optional(),
-	city: Joi.string().optional(),
-	zip_code: Joi.string().optional(),
+	password: Joi.string().min(6).max(20).optional(),
+	country: Joi.string().max(20).optional(),
+	city: Joi.string().max(20).optional(),
+	zip_code: Joi.number().max(5).optional(),
 	address: Joi.string().optional(),
-	type_document: Joi.string().optional(),
-	document_number: Joi.string().optional(),
-	birthdate: Joi.string().optional(),
-	nickname: Joi.string().optional(),
+	type_document: Joi.string().max(15).optional(),
+	document_number: Joi.string()
+		.pattern(new RegExp('^[a-zA-Z]+(-+|)|[0-9]{6,12}(-+|)[a-zA-Z]?$'))
+		.min(9)
+		.max(14)
+		.optional(),
+	birthdate: Joi.string()
+		.pattern(new RegExp('^[0-9]{2}(-|/)[0-9]{2}(-|/)[0-9]{4}$'))
+		.optional(),
+	nickname: Joi.string().min(3).max(20).optional(),
 	avatar: Joi.string().optional(),
 });
