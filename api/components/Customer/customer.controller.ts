@@ -3,27 +3,28 @@ import { CONFIG_GLOBALS } from '@/config';
 import { IWhereClause } from '@/components/User/User.interface';
 import { Op, WhereOptions } from '@sequelize/core';
 import { Request, Response, NextFunction } from 'express';
-import { UserEntity } from '@/components/User/User.entity';
-import { UserDAO } from './User.model';
+import { customerModel } from './customer.model';
+import { CustomerEntity } from './customer.entity';
 
-export const UserController = {
+export const CustomerController = {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
 			console.log('BODY:::>', request.body);
-			/* const user = await UserEntity.create(request.body);
-			await UserDAO.create({ ...user }); */
+			const user = await CustomerEntity(request.body).create();
+			await customerModel.create({ ...user }); /*  */
 			response.status(201).json();
 		} catch (error) {
 			console.log('ERROR:::>', error);
 			next(error);
 		}
 	},
+	/*
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { id } = request.params;
 			const userDatatoModify = await UserEntity.create(request.body);
 
-			await UserDAO.update(userDatatoModify, { where: { id } });
+			await customerModel.update(userDatatoModify, { where: { id } });
 
 			response.status(200).json({ data: 'OK' });
 		} catch (error) {
@@ -34,7 +35,7 @@ export const UserController = {
 		try {
 			const { id } = request.params;
 
-			await UserDAO.destroy({ where: { id } });
+			await customerModel.destroy({ where: { id } });
 
 			response.json({ message: 'OK' });
 		} catch (error) {
@@ -43,7 +44,7 @@ export const UserController = {
 	},
 	async findOne(request: Request, response: Response, next: NextFunction) {
 		try {
-			response.status(200).json({ data: await UserDAO.findOne({}) });
+			response.status(200).json({ data: await customerModel.findOne({}) });
 		} catch (error) {
 			next(error);
 		}
@@ -62,7 +63,7 @@ export const UserController = {
 			if (document_number)
 				where.document_number = { [Op.like]: `%${document_number}%` };
 
-			const user = await UserDAO.findAll({ where });
+			const user = await customerModel.findAll({ where });
 			response.status(200).json({ data: user });
 		} catch (error) {
 			next(error);
@@ -73,7 +74,7 @@ export const UserController = {
 		try {
 			const { email, password } = request.body;
 
-			const user = await UserDAO.findOne({ where: { email } });
+			const user = await customerModel.findOne({ where: { email } });
 
 			if (!user) {
 				return response
@@ -136,7 +137,7 @@ export const UserController = {
 	) => {
 		try {
 			const { email } = request.body;
-			const user = await UserDAO.findOne({ where: { email } });
+			const user = await customerModel.findOne({ where: { email } });
 			if (!user) {
 				return response
 					.status(404)
@@ -146,5 +147,6 @@ export const UserController = {
 		} catch (error) {
 			next(error);
 		}
-	},
+  },
+  */
 };

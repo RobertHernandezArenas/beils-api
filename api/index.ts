@@ -1,6 +1,6 @@
-import { CONFIG_GLOBALS } from './config';
+import { CONFIG_GLOBALS } from '@/config';
 
-import { sequelize } from './database/MYSQL/sequelize';
+import { sequelize } from '@/database/MYSQL/sequelize';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
@@ -21,6 +21,8 @@ export const appConfig = express()
 	.use(express.urlencoded({ extended: true }))
 	.use(express.static(path.join(__dirname, 'public')))
 	.use(APP_ROUTER)
-	.listen(CONFIG_GLOBALS.PORT);
-
-console.log(`✅ Server running on http://localhost:${CONFIG_GLOBALS.PORT}`);
+	.listen(CONFIG_GLOBALS.PORT, () =>
+		console.log(
+			`🚀 Server running: http://localhost:${CONFIG_GLOBALS.PORT}`,
+		),
+	);

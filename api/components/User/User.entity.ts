@@ -1,29 +1,31 @@
 import { Utils } from '../../utils';
-import { IUser } from '../../utils/interfaces/user';
+import { UserDTO } from './User.interface';
+import { adapters } from '@/adapters';
 
-export class UserDTO {
+export class UserEntity {
 	private constructor(
-		public email: string,
 		public name?: string,
 		public surname?: string,
 		public phone?: string,
+		public mobile?: string,
+		public email?: string,
 		public password?: string,
 		public country?: string,
 		public city?: string,
-		public zip_code?: string,
+		public zipcode?: string,
 		public address?: string,
 		public role?: string,
 		public type_document?: string,
 		public document_number?: string,
-		public gender?: string,
+		public genre?: string,
 		public birthdate?: string,
-		public nickname?: string,
+		public username?: string,
 		public avatar?: string,
 		public verificationCode?: number,
 		public isAccountVerified?: boolean,
 	) {}
 
-	public static async create(body: IUser): Promise<UserDTO> {
+	public static async create(body: UserDTO): Promise<UserEntity> {
 		const {
 			email,
 			name,
@@ -32,19 +34,19 @@ export class UserDTO {
 			password,
 			country,
 			city,
-			zip_code,
+			zipcode,
 			address,
 			role,
 			type_document,
 			document_number,
-			gender,
+			genre,
 			birthdate,
-			nickname,
+			username,
 			avatar,
-			verificationCode = Utils.adapters.generateCode(1000001, 9999999),
+			verificationCode = adapters.generateCode(1000001, 9999999),
 			isAccountVerified,
 		} = body;
-		return new UserDTO(
+		return new UserEntity(
 			email?.toLowerCase(),
 			Utils.tools.capitalizeEachFirstLetter(name ?? ''),
 			Utils.tools.capitalizeEachFirstLetter(surname ?? ''),
@@ -52,14 +54,14 @@ export class UserDTO {
 			await Utils.adapters.encrypt(password ?? '123456', 10),
 			country?.toUpperCase() ?? 'SPAIN',
 			city?.toUpperCase() ?? 'A CORUÑA',
-			zip_code,
+			zipcode,
 			address,
 			role?.toUpperCase(),
 			type_document?.toUpperCase() ?? 'DNI',
 			document_number,
-			gender?.toUpperCase() ?? 'FEMALE',
+			genre?.toUpperCase() ?? 'FEMALE',
 			birthdate,
-			nickname,
+			username,
 			avatar,
 			verificationCode,
 			isAccountVerified,

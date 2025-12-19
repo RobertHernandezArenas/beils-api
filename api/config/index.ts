@@ -28,9 +28,11 @@ export const CONFIG_GLOBALS = {
 			TIMESTAMPS: get('TIMESTAMPS_MYSQL').default(1).asBool(),
 			USERNAME: get('USERNAME_MYSQL').default('root').asString(),
 		},
-		TABLES: {
+    TABLES: {
+      AUTH: get('AUTH_TABLE').default('AUTH').asString(),
 			CATEGORY: get('CATEGORY_TABLE').default('CATEGORY').asString(),
 			USER: get('USER_TABLE').default('USER').asString(),
+			CUSTOMER: get('CUSTOMER_TABLE').default('CUSTOMER').asString(),
 			PRODUCT: get('PRODUCT_TABLE').default('PRODUCT').asString(),
 			ORDER: get('ORDER_TABLE').default('ORDER').asString(),
 		},

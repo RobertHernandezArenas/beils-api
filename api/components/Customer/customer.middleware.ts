@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import { userSchema } from './User.schema';
-import User from './index';
+import { customerSchema } from './customer.schema';
 import { verifyToken } from '../../adapters/jwt';
+import { Customer } from '.';
 
-export const UserMiddleware = {
-	validateDataBody: async (
+export class CustomerMiddleware {
+	static async validateDataBody(
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) => {
+	) {
 		try {
-			const result = userSchema.validate(request.body, {
+			const result = customerSchema.validate(request.body, {
 				abortEarly: false,
 			});
 
@@ -26,15 +26,15 @@ export const UserMiddleware = {
 		} catch (error) {
 			return error;
 		}
-	},
-	validateUserByEmail: async (
+	}
+	static async validateUserByEmail(
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) => {
+	) {
 		try {
 			const { email } = request.body;
-			const user = await User.model.findOne({ where: { email } });
+			const user = await Customer.model.findOne({ where: { email } });
 
 			if (user) {
 				return response.status(409).json({
@@ -47,15 +47,15 @@ export const UserMiddleware = {
 		} catch (error) {
 			next(error);
 		}
-	},
-	validateUserByID: async (
+	}
+	static async validateUserByID(
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) => {
+	) {
 		try {
 			const { id } = request.params;
-			const user = await User.model.findByPk(id);
+			const user = await Customer.model.findByPk(id);
 
 			if (!user) {
 				return response.status(409).json({
@@ -68,15 +68,15 @@ export const UserMiddleware = {
 		} catch (error) {
 			next(error);
 		}
-	},
-	validateDataToModify: async (
+	}
+	static async validateDataToModify(
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) => {
+	) {
 		try {
 			const { id } = request.params;
-			const email = await User.model
+			const email = await Customer.model
 				.findByPk(id)
 				.then(x => x?.dataValues.email);
 
@@ -91,12 +91,12 @@ export const UserMiddleware = {
 		} catch (error) {
 			next(error);
 		}
-	},
-	validateRole: async (
+	}
+	static async validateRole(
 		request: Request,
 		response: Response,
 		next: NextFunction,
-	) => {
+	) {
 		try {
 			console.log(' AUTHORIZATION::::>', request.headers.authorization);
 			const { authorization } = request.headers;
@@ -113,13 +113,9 @@ export const UserMiddleware = {
 				'tiringuistinguis',
 			);
 
-			console.log('ROLE:::>', user.role);
-			/*
-			
-			*/
 			next();
 		} catch (error) {
 			next(error);
 		}
-	},
-};
+	}
+}

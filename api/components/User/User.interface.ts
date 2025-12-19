@@ -6,24 +6,25 @@ export interface IWhereClause {
 	phone?: string | object;
 }
 
-export interface IUser {
-	id?: string;
-	name?: string;
-	surname?: string;
-	phone?: string;
+export interface UserDTO {
+	id: string;
+	name: string;
+	surname: string;
+  phone: string;
+  mobile: string;
 	email: string;
-	password?: string;
-	country?: string;
-	city?: string;
-	zip_code?: string;
-	address?: string;
-	role?: string;
+	password: string;
+	country: string;
+	city: string;
+	zipcode: string;
+	address: string;
+	role: string;
 	type_document?: string;
 	document_number?: string;
-	gender?: string;
-	birthdate?: string;
-	nickname?: string;
-	avatar?: string;
+	genre: string;
+	birthdate: string;
+	username: string;
+	avatar: string;
 	verificationCode?: number;
 	isAccountVerified?: boolean;
 }
