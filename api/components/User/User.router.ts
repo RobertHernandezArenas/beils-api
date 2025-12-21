@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { UserController } from '@User/User.controller';
+import { userController } from './user.controller';
 
-export const userRouter = Router().post(
+export const UserRouter = Router().post(
 	'/',
 	/* userMiddleware.validateUserByEmail,
 		userMiddleware.validateDataBody, */
-	UserController.create,
+	
+		userController.create,
 );
 /*
   .post('/login', UserController.login)

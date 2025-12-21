@@ -1,0 +1,44 @@
+.hero-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /* Inicializamos variables en el centro por defecto */
+  --x: 50%;
+  --y: 50%;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* LA MAGIA RADIAL AQUI */
+.layer-reveal {
+  /* Usamos un degradado radial como máscara.
+     - 'circle at var(--x) var(--y)': El centro sigue al mouse.
+     - 'black 50px': El centro es totalmente visible (núcleo duro).
+     - 'transparent 250px': Se desvanece suavemente hacia afuera (el aura).
+  */
+  -webkit-mask-image: radial-gradient(
+    circle at var(--x) var(--y), 
+    black 50px, 
+    transparent 200px
+  );
+  mask-image: radial-gradient(
+    circle at var(--x) var(--y), 
+    black 50px, 
+    transparent 200px
+  );
+  
+  /* Esto asegura que fuera del círculo no se vea nada de Venom */
+  opacity: 1; 
+}

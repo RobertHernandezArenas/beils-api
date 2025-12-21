@@ -1,13 +1,13 @@
-import { UserController } from './User.controller';
-import { userMiddleware } from './User.middleware';
-import { UserModel } from './User.model';
-import { userRouter } from './User.router';
-import { userSchema } from './User.schema';
+import { userController } from './user.controller';
+import { UserMiddleware } from './user.middleware';
+import { UserModel } from './user.model';
+import { UserRouter } from './user.router';
+import { UserSchema } from './user.schema';
 
-export default {
-	router: userRouter,
-	controller: UserController,
+export const User = {
+	router: UserRouter,
+	controller: userController,
 	model: UserModel,
-	middleware: userMiddleware,
-	schema: userSchema,
+	middleware: UserMiddleware,
+	schema: UserSchema,
 };

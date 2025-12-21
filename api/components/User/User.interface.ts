@@ -6,12 +6,12 @@ export interface IWhereClause {
 	phone?: string | object;
 }
 
-export interface UserDTO {
+export interface CustomerDTO {
 	id: string;
 	name: string;
 	surname: string;
-  phone: string;
-  mobile: string;
+	phone: string;
+	mobile: string;
 	email: string;
 	password: string;
 	country: string;
@@ -27,4 +27,27 @@ export interface UserDTO {
 	avatar: string;
 	verificationCode?: number;
 	isAccountVerified?: boolean;
+	is_lopd_accepted: boolean;
+	is_rgpd_accepted: boolean;
+	is_terms_and_conditions_accepted: boolean;
+}
+
+export interface CustomerCreateDTO {
+	id: string;
+	name: string;
+	surname: string;
+	mobile: string;
+	email: string;
+	country: 'SPAIN';
+	city: 'A CORUÑA';
+	zipcode: string;
+	address: string;
+	role: 'USER';
+	type_document?: string;
+	document_number?: string;
+	genre: 'MALE' | 'FEMALE';
+	birthdate: string;
+	is_lopd_accepted: boolean;
+	is_rgpd_accepted: boolean;
+	is_terms_and_conditions_accepted: boolean;
 }

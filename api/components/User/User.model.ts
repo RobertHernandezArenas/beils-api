@@ -5,7 +5,7 @@ import { CONFIG_GLOBALS } from '@/config';
 
 const { USER } = CONFIG_GLOBALS.DATABASE.TABLES;
 
-const UserModel = {
+const userSequelizeSchema = {
 	id: {
 		type: DataTypes.STRING,
 		unique: true,
@@ -15,38 +15,10 @@ const UserModel = {
 	},
 	name: { type: DataTypes.STRING },
 	surname: { type: DataTypes.STRING },
-	phone: { type: DataTypes.STRING },
-	mobile: { type: DataTypes.STRING },
 	email: { type: DataTypes.STRING, unique: true, allowNull: false },
 	password: {
 		type: DataTypes.STRING,
-		defaultValue: '123456',
 	},
-	country: {
-		type: DataTypes.STRING,
-		defaultValue: 'SPAIN',
-	},
-	city: {
-		type: DataTypes.STRING,
-		defaultValue: 'A CORUÑA',
-	},
-	zipcode: { type: DataTypes.STRING },
-	address: { type: DataTypes.STRING },
-	role: { type: DataTypes.STRING, allowNull: false, defaultValue: USER },
-	type_document: {
-		type: DataTypes.STRING,
-		defaultValue: 'DNI',
-	},
-	document_number: { type: DataTypes.STRING, unique: true },
-	genre: {
-		type: DataTypes.STRING,
-		defaultValue: 'FEMALE',
-	},
-	birthdate: { type: DataTypes.DATE },
-	username: { type: DataTypes.STRING },
-	avatar: { type: DataTypes.STRING },
-	verificationCode: { type: DataTypes.INTEGER },
-	isAccountVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
 };
 
-export const UserDAO = sequelize.define(USER, UserModel);
+export const UserModel = sequelize.define(USER, userSequelizeSchema);

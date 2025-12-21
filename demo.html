@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efecto Venom Líquido</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+<style>
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; }
+        
+        .hero-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .layer img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Enlazamos la capa superior con la máscara SVG */
+        .reveal {
+            mask: url(#venomMask);
+            -webkit-mask: url(#venomMask);
+        }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 9999;">
+        <defs>
+            <filter id="liquidFilter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.01" numOctaves="2" result="noise" id="turbulence" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="60" />
+            </filter>
+            
+            <mask id="venomMask">
+                <circle 
+                    id="maskCircle" 
+                    cx="50%" cy="50%" r="100" 
+                    fill="white" 
+                    style="filter: url(#liquidFilter);"
+                />
+            </mask>
+        </defs>
+    </svg>
+
+    <section class="hero-container">
+        <div class="layer base">
+            <img src="spiderman.png" alt="Spider-Man">
+        </div>
+        
+        <div class="layer reveal">
+            <img src="venom.png" alt="Venom">
+        </div>
+    </section>
+
+    <script>
+        // Referencias
+        const maskCircle = document.getElementById("maskCircle");
+        const turbulence = document.getElementById("turbulence");
+
+        // EVENTO MOUSEMOVE
+        window.addEventListener("mousemove", (e) => {
+            // USAMOS GSAP PARA ANIMAR ATRIBUTOS 'cx' Y 'cy' DIRECTAMENTE
+            // overwrite: "auto" es CRUCIAL. Evita conflictos entre movimientos rápidos.
+            gsap.to(maskCircle, {
+                attr: { 
+                    cx: e.clientX, 
+                    cy: e.clientY 
+                },
+                duration: 0.35,       // Ajusta esto para más o menos "lag" (0.1 rápido, 0.5 lento)
+                ease: "power2.out",  // Suavizado natural
+                overwrite: "auto"
+            });
+        });
+
+        // ANIMACIÓN DEL LÍQUIDO (Bucle infinito)
+        gsap.to(turbulence, {
+            duration: 4,
+            attr: { baseFrequency: "0.01 0.02" }, // Variación suave de la textura
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+    </script>
+
+</body>
+</html>

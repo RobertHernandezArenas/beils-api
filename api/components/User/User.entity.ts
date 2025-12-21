@@ -1,9 +1,9 @@
-import { Utils } from '../../utils';
-import { UserDTO } from './User.interface';
-import { adapters } from '@/adapters';
+import { CustomerCreateDTO, CustomerDTO } from './user.interface';
+import { customerModel } from './user.model';
 
-export class UserEntity {
+export class CustomerEntity {
 	private constructor(
+		public id?: string,
 		public name?: string,
 		public surname?: string,
 		public phone?: string,
@@ -23,48 +23,37 @@ export class UserEntity {
 		public avatar?: string,
 		public verificationCode?: number,
 		public isAccountVerified?: boolean,
-	) {}
+		public is_lopd_accepted?: boolean,
+		public is_rgpd_accepted?: boolean,
+		public is_terms_and_conditions_accepted?: boolean,
+	) {
+		this.id = id;
+		this.name = name;
+		this.surname = surname;
+		this.phone = phone;
+		this.mobile = mobile;
+		this.email = email;
+		this.password = password;
+		this.country = country;
+		this.city = city;
+		this.zipcode = zipcode;
+		this.address = address;
+		this.role = role;
+		this.type_document = type_document;
+		this.document_number = document_number;
+		this.genre = genre;
+		this.birthdate = birthdate;
+		this.username = username;
+		this.avatar = avatar;
+		this.verificationCode = verificationCode;
+		this.isAccountVerified = isAccountVerified;
+		this.is_lopd_accepted = is_lopd_accepted;
+		this.is_rgpd_accepted = is_rgpd_accepted;
+		this.is_terms_and_conditions_accepted =
+			is_terms_and_conditions_accepted;
+	}
 
-	public static async create(body: UserDTO): Promise<UserEntity> {
-		const {
-			email,
-			name,
-			surname,
-			phone,
-			password,
-			country,
-			city,
-			zipcode,
-			address,
-			role,
-			type_document,
-			document_number,
-			genre,
-			birthdate,
-			username,
-			avatar,
-			verificationCode = adapters.generateCode(1000001, 9999999),
-			isAccountVerified,
-		} = body;
-		return new UserEntity(
-			email?.toLowerCase(),
-			Utils.tools.capitalizeEachFirstLetter(name ?? ''),
-			Utils.tools.capitalizeEachFirstLetter(surname ?? ''),
-			phone,
-			await Utils.adapters.encrypt(password ?? '123456', 10),
-			country?.toUpperCase() ?? 'SPAIN',
-			city?.toUpperCase() ?? 'A CORUÑA',
-			zipcode,
-			address,
-			role?.toUpperCase(),
-			type_document?.toUpperCase() ?? 'DNI',
-			document_number,
-			genre?.toUpperCase() ?? 'FEMALE',
-			birthdate,
-			username,
-			avatar,
-			verificationCode,
-			isAccountVerified,
-		);
+	public static async create(): Promise<any> {
+		return customerModel.create();
 	}
 }

@@ -17,19 +17,19 @@ export const CONFIG_GLOBALS = {
 	DATABASE: {
 		MYSQL: {
 			ACQUIRE: get('ACQUIRE_MYSQL').default(30000).asInt(),
-			DB_NAME: get('DATABASE_MYSQL').default('beils').asString(),
+			DB_NAME: get('DATABASE_MYSQL').default('beils_db').asString(),
 			DIALECT: get('DIALECT_MYSQL').default('mysql').asString(),
 			HOST: get('HOST_MYSQL').default('localhost').asString(),
 			IDLE: get('IDLE_MYSQL').default(10000).asInt(),
-			PASSWORD: get('PASSWORD_MYSQL').default('root').asString(),
+			PASSWORD: get('PASSWORD_MYSQL').default('2Noviembre2025').asString(),
 			POOL_MAX: get('POOL_MAX_MYSQL').default(5).asInt(),
 			POOL_MIN: get('POOL_MIN_MYSQL').default(0).asInt(),
 			PORT: get('PORT_MYSQL').default(3306).asPortNumber(),
 			TIMESTAMPS: get('TIMESTAMPS_MYSQL').default(1).asBool(),
 			USERNAME: get('USERNAME_MYSQL').default('root').asString(),
 		},
-    TABLES: {
-      AUTH: get('AUTH_TABLE').default('AUTH').asString(),
+		TABLES: {
+			AUTH: get('AUTH_TABLE').default('AUTH').asString(),
 			CATEGORY: get('CATEGORY_TABLE').default('CATEGORY').asString(),
 			USER: get('USER_TABLE').default('USER').asString(),
 			CUSTOMER: get('CUSTOMER_TABLE').default('CUSTOMER').asString(),

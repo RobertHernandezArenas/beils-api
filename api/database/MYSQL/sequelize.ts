@@ -3,7 +3,7 @@ import { Sequelize } from '@sequelize/core';
 import { MySqlDialect } from '@sequelize/mysql';
 
 export const sequelize = new Sequelize({
-	database: CONFIG_GLOBALS.DATABASE.MYSQL.DB_NAME,
+	database: 'beils_db',
 	user: CONFIG_GLOBALS.DATABASE.MYSQL.USERNAME,
 	password: CONFIG_GLOBALS.DATABASE.MYSQL.PASSWORD,
 	host: CONFIG_GLOBALS.DATABASE.MYSQL.HOST,

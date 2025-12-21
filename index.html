@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <section class="hero-container">
+  <div class="layer layer-base">
+    <img src="spiderman.png" alt="spider">
+  </div>
+  
+  <div class="layer layer-reveal">
+    <img src="venom.png" alt="venom">
+  </div>
+</section>
+
+<script >
+const container = document.querySelector('.hero-container');
+
+container.addEventListener('mousemove', (e) => {
+  // Obtenemos coordenadas exactas en píxeles
+  const x = e.clientX;
+  const y = e.clientY;
+  
+  // Actualizamos las variables CSS con píxeles (px)
+  container.style.setProperty('--x', `${x}px`);
+  container.style.setProperty('--y', `${y}px`);
+});
+</script>
+</body>
+</html>

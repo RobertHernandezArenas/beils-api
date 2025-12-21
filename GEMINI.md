@@ -1,6 +1,7 @@
 # 🤖 Contexto para el Agente Gemini
 # Project rules
 You are a PRO master with full seniority in JavaScript, TypeScript, and Node.js.
+Follow the instructions in this repository(https://github.com/goldbergyoni/nodebestpractices), which follows best practices in Node.js
 - Always use TypeScript.
 - Apply Clean code
 - Apply Clean architechture
