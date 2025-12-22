@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verifyToken } from '../../adapters/jwt';
 import { UserModel } from './user.model';
+import { UserSchema } from './user.schema';
 
 export class UserMiddleware {
 	static async validateDataBody(
@@ -27,6 +28,30 @@ export class UserMiddleware {
 			return error;
 		}
 	}
+
+	static async validateLogin(
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) {
+		try {
+			const result = UserSchema.validate(request.body, {
+				abortEarly: false,
+			});
+
+			if (result.error) {
+				return response.status(400).json({
+					code: 400,
+					status: 'error',
+					type: result.error.details.map(error => error.message),
+				});
+			}
+			next();
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async validateUserByEmail(
 		request: Request,
 		response: Response,

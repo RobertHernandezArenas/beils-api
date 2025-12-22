@@ -1,6 +1,6 @@
 import { encrypt, encryptCompare } from './bcrypt';
 import { generateToken, verifyToken } from './jwt';
-import { generateID } from './nanoID';
+import { generateID, generateUUID } from './nanoID';
 import { generateCode } from './generateCode';
 import { emailAdapter } from './nodemailer';
 import { validateInput } from './joi';
@@ -13,5 +13,6 @@ export const adapters = {
 	verifyToken,
 	generateCode,
 	...emailAdapter,
-	validateInput
+	validateInput,
+	generateUUID,
 };

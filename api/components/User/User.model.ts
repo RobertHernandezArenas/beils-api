@@ -9,7 +9,7 @@ const userSequelizeSchema = {
 	id: {
 		type: DataTypes.STRING,
 		unique: true,
-		defaultValue: adapters.generateID(6),
+		defaultValue: adapters.generateUUID(),
 		primaryKey: true,
 		allowNull: false,
 	},

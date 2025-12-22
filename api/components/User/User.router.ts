@@ -10,10 +10,10 @@ export const UserRouter = Router()
 
 		userController.create,
 	)
+	.post('/login', UserMiddleware.validateLogin, userController.login)
 	.get('/', userController.findAll)
 	.get('/:id', userController.findById);
 /*
-  .post('/login', UserController.login)
 	.post('/forgot-password', UserController.forgotPassword)
 	.get('/', UserController.findAll)
 	.get('/:id', userMiddleware.validateRole, UserController.findOne)
