@@ -1,5 +1,7 @@
 import joi from 'joi';
+import {z as zod} from 'zod';
 
-export const validate = () => {
+
+export const validateInput = () => {
 	return joi;
 };

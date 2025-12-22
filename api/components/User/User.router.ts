@@ -1,13 +1,17 @@
 import { Router } from 'express';
 import { userController } from './user.controller';
+import { UserMiddleware } from './user.middleware';
 
-export const UserRouter = Router().post(
-	'/',
-	/* userMiddleware.validateUserByEmail,
-		userMiddleware.validateDataBody, */
-	
+export const UserRouter = Router()
+	.post(
+		'/',
+		UserMiddleware.validateUserByEmail,
+		/* userMiddleware.validateDataBody, */
+
 		userController.create,
-);
+	)
+	.get('/', userController.findAll)
+	.get('/:id', userController.findById);
 /*
   .post('/login', UserController.login)
 	.post('/forgot-password', UserController.forgotPassword)

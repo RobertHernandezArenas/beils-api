@@ -6,13 +6,13 @@ export const APP_ROUTER = Router()
 		response.json({ message: 'Hello from the API!' });
 	})
 
-	.use('/api/v1/customer', User.router)
+	.use('/api/v1/user', User.router)
 
 	.use('*', (request: Request, response: Response) => {
 		response.status(404).json({
 			error: {
 				code: 404,
-				name: 'NOT_FOUND',
+				type: 'NO_ENCONTRADO',
 			},
 			data: false,
 		});
@@ -21,7 +21,9 @@ export const APP_ROUTER = Router()
 	.use((error: Error, request: Request, response: Response) => {
 		console.log(`[Server Error]: ${error.message}`);
 		response.status(500).json({
-			error: 'Internal Server Error',
-			details: 'Something went wrong on the server',
+			error: {
+				code: 500,
+				type: 'ERROR_INTERNO_DEL_SERVIDOR',
+			},
 		});
 	});

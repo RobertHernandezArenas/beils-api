@@ -13,11 +13,13 @@ const userSequelizeSchema = {
 		primaryKey: true,
 		allowNull: false,
 	},
-	name: { type: DataTypes.STRING },
-	surname: { type: DataTypes.STRING },
 	email: { type: DataTypes.STRING, unique: true, allowNull: false },
 	password: {
 		type: DataTypes.STRING,
+	},
+	role: {
+		type: DataTypes.STRING,
+		defaultValue: 'ADMIN',
 	},
 };
 

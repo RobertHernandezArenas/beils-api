@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { verifyToken } from '../../adapters/jwt';
+import { UserModel } from './user.model';
 
 export class UserMiddleware {
 	static async validateDataBody(
@@ -32,18 +33,15 @@ export class UserMiddleware {
 		next: NextFunction,
 	) {
 		try {
-			/*
 			const { email } = request.body;
-			const user = await Customer.model.findOne({ where: { email } });
+			const user = await UserModel.findOne({ where: { email } });
 
 			if (user) {
 				return response.status(409).json({
-					code: 409,
-					status: 'error',
-					type: 'CONFLICT',
+					error: { code: 409, type: 'CONFLICTO' },
 				});
 			}
-				*/
+
 			next();
 		} catch (error) {
 			next(error);

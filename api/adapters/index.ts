@@ -3,6 +3,7 @@ import { generateToken, verifyToken } from './jwt';
 import { generateID } from './nanoID';
 import { generateCode } from './generateCode';
 import { emailAdapter } from './nodemailer';
+import { validateInput } from './joi';
 
 export const adapters = {
 	encrypt,
@@ -12,4 +13,5 @@ export const adapters = {
 	verifyToken,
 	generateCode,
 	...emailAdapter,
+	validateInput
 };
