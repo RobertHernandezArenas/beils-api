@@ -3,10 +3,10 @@ import { Request, Response, Router } from 'express';
 
 export const APP_ROUTER = Router()
 	.get('/', (request: Request, response: Response) => {
-		response.json({ message: 'Hello from the API!' });
+		response.json({ data: { message: 'Hello from the API!' } });
 	})
 
-	.use('/api/v1/user', User.router)
+	.use('/api/v1/user', User.Router)
 
 	.use('*', (request: Request, response: Response) => {
 		response.status(404).json({
