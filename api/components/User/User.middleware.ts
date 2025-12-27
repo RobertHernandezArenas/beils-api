@@ -10,8 +10,7 @@ export class UserMiddleware {
 		next: NextFunction,
 	) {
 		try {
-			/*
-			const result = customerSchema.validate(request.body, {
+			const result = UserSchema.validate(request.body, {
 				abortEarly: false,
 			});
 
@@ -22,7 +21,7 @@ export class UserMiddleware {
 					type: result.error.details.map(error => error.message),
 				});
 			}
-*/
+
 			return next();
 		} catch (error) {
 			return error;

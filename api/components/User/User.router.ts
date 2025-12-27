@@ -6,7 +6,7 @@ export const UserRouter = Router()
 	.post(
 		'/',
 		UserMiddleware.validateUserByEmail,
-		/* userMiddleware.validateDataBody, */
+		UserMiddleware.validateDataBody,
 
 		userController.create,
 	)
