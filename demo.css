@@ -1,0 +1,33 @@
+body, html { margin: 0; padding: 0; overflow: hidden; background: #111; }
+
+.hero-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    /* Inicializamos las variables fuera de pantalla para que no moleste al cargar */
+    --x: -500px;
+    --y: -500px;
+}
+
+.layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.reveal {
+    /* Aplicamos la máscara definida en el SVG */
+    mask: url(#venomMask);
+    -webkit-mask: url(#venomMask);
+    
+    /* Importante: para que el navegador sepa qué sistema de coordenadas usar */
+    mask-mode: alpha;
+}
