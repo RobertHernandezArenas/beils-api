@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 		//
 		new winston.transports.File({
 			filename: 'log/error.log',
-			level: 'error.log',
+			level: 'error',
 		}),
 		new winston.transports.File({
 			filename: 'log/combined.log',
@@ -34,13 +34,31 @@ if (CONFIG_GLOBALS.ENVIRONMENT !== 'production') {
 	);
 }
 
-export function buildLogger(service: string) {
+export function buildLogger(file: string) {
 	return {
-		log: (message: string) => {
-			logger.log('info', { message, service });
+		log: (message: string, line?: number | string) => {
+			const lineNumber = line ?? getCallerLine();
+			logger.info(message, { file, line: lineNumber });
 		},
-		error: (message: string) => {
-			logger.error('error', { message, service });
+		error: (message: string, line?: number | string) => {
+			const lineNumber = line ?? getCallerLine();
+			logger.error(message, { file, line: lineNumber });
 		},
 	};
+}
+
+function getCallerLine(): string {
+	const stack = new Error().stack;
+	if (!stack) return '';
+
+	const stackLines = stack.split('\n');
+	// 0: Error
+	// 1: at getCallerLine
+	// 2: at Object.log/error (dentro de buildLogger)
+	// 3: at Caller (donde se llamó al logger)
+	const callerLine = stackLines[3];
+	if (!callerLine) return '';
+
+	const match = callerLine.match(/:(\d+):\d+\)?$/);
+	return match ? match[1] : '';
 }

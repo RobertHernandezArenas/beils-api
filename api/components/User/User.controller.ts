@@ -2,31 +2,41 @@ import { Request, Response, NextFunction } from 'express';
 import { adapters } from '@/adapters';
 import { CONFIG_GLOBALS } from '@/config';
 import { UserModel } from './user.model';
+import { buildLogger } from '@/utils/logger';
 
-interface UserResponse {
-	email: string;
-	createdAt: string;
-	updatedAt: string;
-}
+const logger = buildLogger('user.controller.ts');
 
 class UserController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { email, password } = request.body;
 
+			// validamos si el usuario ya existe
+			const userData = await UserModel.findOne({ where: { email } });
+
+			if (userData) {
+        // logger
+        
+				logger.error(`El usuario con email ${email} ya existe`);
+				return response.status(409).json({
+					error: {
+						code: 409,
+						type: 'CONFLICTO',
+					},
+				});
+			}
+
+			// creamos el usuario
 			const user = await UserModel.create({
 				email,
 				password: await adapters.encrypt(password, 10),
 				role: 'ADMIN',
 			});
 
+			// respondemos
 			response.status(201).json({
 				error: false,
-				data: {
-					id: user.dataValues.id,
-					createdAt: user.dataValues.createdAt,
-					updatedAt: user.dataValues.updatedAt,
-				},
+				data: user,
 			});
 		} catch (error) {
 			console.log('ERROR:::>', error);

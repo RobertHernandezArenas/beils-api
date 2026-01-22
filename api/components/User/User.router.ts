@@ -3,14 +3,8 @@ import { userController } from './user.controller';
 import { UserMiddleware } from './user.middleware';
 
 export const UserRouter = Router()
-	.post(
-		'/',
-		UserMiddleware.validateUserByEmail,
-		UserMiddleware.validateDataBody,
-
-		userController.create,
-	)
-	.post('/login', UserMiddleware.validateLogin, userController.login)
+	.post('/', UserMiddleware.validatorDataBody, userController.create)
+	.post('/login', userController.login)
 	.get('/', userController.findAll)
 	.get('/:id', userController.findById);
 /*
@@ -20,7 +14,7 @@ export const UserRouter = Router()
 	.put(
 		'/:id',
 		userMiddleware.validateUserByID,
-		userMiddleware.validateDataBody,
+		userMiddleware.validatorDataBody,
 		userMiddleware.validateDataToModify,
 		UserController.update,
 	)
