@@ -7,6 +7,10 @@ Follow the instructions in this repository(https://github.com/goldbergyoni/nodeb
 - Apply Clean architechture
 - Apply S.O.L.I.D principles
 - Apply D.R.Y(don't repeat yourself) + KISS(keep it simple stupuid)
+- Apply T.E.S.T principles
+- Always write unit tests with Jest.
+- Always write integration tests with Supertest.
+- Always write e2e tests with Playwright.
 
 ## 🏗️ Architechture and Stack
 - **Framework:** Node js (Express).
