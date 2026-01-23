@@ -1,19 +1,12 @@
-import { CONFIG_GLOBALS } from '@/config';
-
-import { sequelize } from './sequelize';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
+
+import { CONFIG_GLOBALS } from '@/config';
 import { APP_ROUTER } from '@router/index';
 
-/* try {
-	sequelize.authenticate();
-	sequelize.sync();
-} catch (error) {
-	// console.error('Unable to connect to the database:', error);
-}
- */
+
 export const appConfig = express()
 	.use(morgan('dev'))
 	.use(cors())
