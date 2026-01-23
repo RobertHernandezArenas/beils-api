@@ -15,5 +15,5 @@ Follow the instructions in this repository(https://github.com/goldbergyoni/nodeb
 ## 🏗️ Architechture and Stack
 - **Framework:** Node js (Express).
 - **Language:** TypeScript (Strict Mode).
-- **Database:** MySQL + Sequelize.
+- **Database:** MySQL + Prisma.
 - **Styles:** Tailwind CSS.

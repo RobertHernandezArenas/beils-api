@@ -1,5 +1,5 @@
 import { DataTypes } from '@sequelize/core';
-import { sequelize } from '../../database/MYSQL/sequelize';
+import { sequelize } from '../../sequelize';
 import { adapters } from '../../adapters';
 import { CONFIG_GLOBALS } from '@/config';
 

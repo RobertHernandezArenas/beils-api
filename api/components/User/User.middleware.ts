@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { verifyToken } from '../../adapters/jwt';
-import { UserModel } from './user.model';
-import { UserSchema, validatorDataBody } from './user.schema';
+import { UserSchema, validatorDataBody } from '@user/User.schema';
 
 export class UserMiddleware {
 	static async validatorDataBody(

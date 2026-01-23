@@ -3,6 +3,7 @@ import { adapters } from '@/adapters';
 import { CONFIG_GLOBALS } from '@/config';
 import { UserModel } from './user.model';
 import { buildLogger } from '@/utils/logger';
+import { prismaClient } from '../../../lib/prisma';
 
 const logger = buildLogger('user.controller.ts');
 
@@ -12,10 +13,13 @@ class UserController {
 			const { email, password } = request.body;
 
 			// validamos si el usuario ya existe
-			const userData = await UserModel.findOne({ where: { email } });
+			// const userData = await UserModel.findOne({ where: { email } });
+			const userData = await prismaClient.user.findUnique({
+				where: { email },
+			});
 
 			if (userData) {
-        // logger
+				// logger
 				logger.error(`El usuario con email ${email} ya existe`);
 				return response.status(409).json({
 					error: {
@@ -26,10 +30,18 @@ class UserController {
 			}
 
 			// creamos el usuario
-			const user = await UserModel.create({
+			/* const user = await UserModel.create({
 				email,
 				password: await adapters.encrypt(password, 10),
 				role: 'USER',
+			});
+ */
+
+			const user = await prismaClient.user.create({
+				data: {
+					email,
+					password: await adapters.encrypt(password, 10),
+				},
 			});
 
 			// respondemos
@@ -47,14 +59,14 @@ class UserController {
 		try {
 			const users = await UserModel.findAll();
 			response.status(200).json({
-				data: users.map(user => {
+				data: users /* users.map(user => {
 					return {
 						id: user.dataValues.id,
 						email: user.dataValues.email,
 						createdAt: user.dataValues.createdAt,
 						updatedAt: user.dataValues.updatedAt,
 					};
-				}),
+				}) */,
 				meta: {
 					total: users.length,
 				},

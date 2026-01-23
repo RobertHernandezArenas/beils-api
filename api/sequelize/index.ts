@@ -1,4 +1,4 @@
-import { CONFIG_GLOBALS } from '@config/index';
+import { CONFIG_GLOBALS } from '../config';
 import { Sequelize } from '@sequelize/core';
 import { MySqlDialect } from '@sequelize/mysql';
 

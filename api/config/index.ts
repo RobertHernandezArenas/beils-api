@@ -26,7 +26,8 @@ export const CONFIG_GLOBALS = {
 			POOL_MIN: get('POOL_MIN_MYSQL').default(0).asInt(),
 			PORT: get('PORT_MYSQL').default(3306).asPortNumber(),
 			TIMESTAMPS: get('TIMESTAMPS_MYSQL').default(1).asBool(),
-			USERNAME: get('USERNAME_MYSQL').default('root').asString(),
+      USERNAME: get('USERNAME_MYSQL').default('root').asString(),
+      URL: get('DATABASE_URL_MYSQL').default('mysql://root:24Enero2011.@localhost:3306/beils_db').asString(),
 		},
 		TABLES: {
 			AUTH: get('AUTH_TABLE').default('AUTH').asString(),

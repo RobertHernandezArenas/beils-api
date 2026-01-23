@@ -12,3 +12,10 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
+  role     String @default("ADMIN") @db.VarChar(10)
+}
