@@ -16,7 +16,6 @@ class UserController {
 
 			if (userData) {
         // logger
-        
 				logger.error(`El usuario con email ${email} ya existe`);
 				return response.status(409).json({
 					error: {
@@ -30,7 +29,7 @@ class UserController {
 			const user = await UserModel.create({
 				email,
 				password: await adapters.encrypt(password, 10),
-				role: 'ADMIN',
+				role: 'USER',
 			});
 
 			// respondemos
