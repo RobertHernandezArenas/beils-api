@@ -43,51 +43,45 @@ class UserController {
 	}
 
 	async findAll(request: Request, response: Response, next: NextFunction) {
-		/* try {
-      const users = await UserModel.findAll();
-      response.status(200).json({
-        data: users users.map(user => {
-          return {
-            id: user.dataValues.id,
-            email: user.dataValues.email,
-            createdAt: user.dataValues.createdAt,
-            updatedAt: user.dataValues.updatedAt,
-          };
-        })
-        meta: {
-          total: users.length,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }*/
+		try {
+			const users = (await prismaClient.user.findMany()) || [];
+			response.status(200).json({
+				data: users,
+				meta: {
+					total: users.length,
+				},
+			});
+		} catch (error) {
+			logger.error((error as Error).message);
+			next(error);
+		}
 	}
 
 	async findById(request: Request, response: Response, next: NextFunction) {
-		/* try {
-      const { id } = request.params;
-      const user = await UserModel.findByPk(id);
+		try {
+			const { id } = request.params;
+			const user = await prismaClient.user.findUnique({
+				where: { id },
+			});
 
-      if (!user) {
-        return response.status(404).json({
-          error: {
-            code: 404,
-            type: 'NO_ENCONTRADO',
-          },
-        });
-      }
-      response.status(200).json({
-        data: {
-          id: user.dataValues.id,
-          email: user.dataValues.email,
-          createdAt: user.dataValues.createdAt,
-          updatedAt: user.dataValues.updatedAt,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-    */
+			if (!user) {
+				return response.status(404).json({
+					error: {
+						code: 404,
+						type: 'NO_ENCONTRADO',
+					},
+				});
+			}
+			response.status(200).json({
+				data: {
+					id: user.id,
+					email: user.email,
+				},
+			});
+		} catch (error) {
+			logger.error((error as Error).message);
+			next(error);
+		}
 	}
 	async login(request: Request, response: Response, next: NextFunction) {
 		/*try {

@@ -1,8 +1,7 @@
-import { userController } from "./User.controller";
-import { UserMiddleware } from "./User.middleware";
-import { UserRouter } from "./User.router";
-import { UserSchema } from "./User.schema";
-
+import { userController } from './User.controller';
+import { UserMiddleware } from './User.middleware';
+import { UserRouter } from './User.router';
+import { UserSchema } from './User.validation.schema';
 
 export const User = {
 	Router: UserRouter,

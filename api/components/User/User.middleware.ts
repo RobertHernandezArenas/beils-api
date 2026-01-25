@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserSchema, validatorDataBody } from '@user/User.schema';
+import {
+	UserSchema,
+	validatorDataBody,
+} from '@/components/User/User.validation.schema';
 
 export class UserMiddleware {
 	static async validatorDataBody(

@@ -12,10 +12,420 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+enum ConsentType {
+  lgpd
+  indiba
+  laser
+}
 
 model User {
   id       String @id @default(uuid())
   email    String @unique @db.VarChar(50)
   password String @db.VarChar(255)
   role     String @default("ADMIN") @db.VarChar(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  clientId      String          @id @default(uuid()) @map("client_id") @db.Char(36)
+  firstName     String?         @map("first_name") @db.VarChar(100)
+  lastName      String?         @map("last_name") @db.VarChar(100)
+  email         String?         @unique @db.VarChar(255)
+  phone         String?         @db.VarChar(20)
+  birthDate     DateTime?       @map("birth_date") @db.Date
+  gender        String?         @db.VarChar(20)
+  address       String?         @db.VarChar(255)
+  city          String?         @db.VarChar(100)
+  postalCode    String?         @map("postal_code") @db.VarChar(20)
+  country       String?         @db.VarChar(100)
+  createdAt     DateTime?       @map("created_at") @db.DateTime
+  updatedAt     DateTime?       @map("updated_at") @db.DateTime
+  isActive      Boolean?        @default(true) @map("is_active")
+  
+  consents      Consent[]
+  questionnaires Questionnaire[]
+  bonus         Bonus[]
+  giftcards     Giftcard[]
+  debts         Debt[]
+  carts         Cart[]
+  bookings      Booking[]
+  revokes       Revoke[]
+
+  @@map("clients")
+}
+
+model Brand {
+  brandId     String    @id @default(uuid()) @map("brand_id") @db.Char(36)
+  name        String?   @unique @db.VarChar(100)
+  description String?   @db.VarChar(255)
+  createdAt   DateTime? @map("created_at") @db.DateTime
+  products    Product[]
+
+  @@map("brands")
+}
+
+model Category {
+  categoryId    String        @id @default(uuid()) @map("category_id") @db.Char(36)
+  name          String?       @unique @db.VarChar(100)
+  description   String?       @db.VarChar(255)
+  type          String?       @db.VarChar(20)
+  subcategories Subcategory[]
+
+  @@map("categories")
+}
+
+model Subcategory {
+  subcategoryId String    @id @default(uuid()) @map("subcategory_id") @db.Char(36)
+  categoryId    String?   @map("category_id") @db.Char(36)
+  name          String?   @db.VarChar(100)
+  
+  category      Category? @relation(fields: [categoryId], references: [categoryId])
+  products      Product[]
+  services      Service[]
+
+  @@unique([categoryId, name], name: "unique_cat_name")
+  @@map("subcategories")
+}
+
+model Product {
+  productId     String              @id @default(uuid()) @map("product_id") @db.Char(36)
+  brandId       String?             @map("brand_id") @db.Char(36)
+  subcategoryId String?             @map("subcategory_id") @db.Char(36)
+  name          String?             @db.VarChar(255)
+  description   String?             @db.VarChar(255)
+  sku           String?             @unique @db.VarChar(100)
+  price         Decimal?            @db.Decimal(10, 2)
+  cost          Decimal?            @db.Decimal(10, 2)
+  stockQuantity Int?                @map("stock_quantity")
+  isActive      Boolean?            @default(true) @map("is_active")
+  createdAt     DateTime?           @map("created_at") @db.DateTime
+  updatedAt     DateTime?           @map("updated_at") @db.DateTime
+
+  brand         Brand?              @relation(fields: [brandId], references: [brandId])
+  subcategory   Subcategory?        @relation(fields: [subcategoryId], references: [subcategoryId])
+  packItems     PackItemProduct[]
+  cartItems     CartItemProduct[]
+  tags          ProductTag[]
+
+  @@map("products")
+}
+
+model Service {
+  serviceId       String              @id @default(uuid()) @map("service_id") @db.Char(36)
+  subcategoryId   String?             @map("subcategory_id") @db.Char(36)
+  name            String?             @db.VarChar(255)
+  description     String?             @db.VarChar(255)
+  durationMinutes Int?                @map("duration_minutes")
+  price           Decimal?            @db.Decimal(10, 2)
+  isActive        Boolean?            @default(true) @map("is_active")
+  createdAt       DateTime?           @map("created_at") @db.DateTime
+  updatedAt       DateTime?           @map("updated_at") @db.DateTime
+
+  subcategory     Subcategory?        @relation(fields: [subcategoryId], references: [subcategoryId])
+  packItems       PackItemService[]
+  bonus           Bonus[]
+  cartItems       CartItemService[]
+  bookings        Booking[]
+
+  @@map("services")
+}
+
+model Pack {
+  packId      String            @id @default(uuid()) @map("pack_id") @db.Char(36)
+  name        String?           @db.VarChar(255)
+  description String?           @db.VarChar(255)
+  price       Decimal?          @db.Decimal(10, 2)
+  isActive    Boolean?          @default(true) @map("is_active")
+  createdAt   DateTime?         @map("created_at") @db.DateTime
+
+  products    PackItemProduct[]
+  services    PackItemService[]
+  cartItems   CartItemPack[]
+  bookings    Booking[]
+
+  @@map("packs")
+}
+
+model PackItemProduct {
+  packItemProductId String   @id @default(uuid()) @map("pack_item_product_id") @db.Char(36)
+  packId            String?  @map("pack_id") @db.Char(36)
+  productId         String?  @map("product_id") @db.Char(36)
+  quantity          Int?
+
+  pack              Pack?    @relation(fields: [packId], references: [packId])
+  product           Product? @relation(fields: [productId], references: [productId])
+
+  @@map("pack_items_products")
+}
+
+model PackItemService {
+  packItemServiceId String   @id @default(uuid()) @map("pack_item_service_id") @db.Char(36)
+  packId            String?  @map("pack_id") @db.Char(36)
+  serviceId         String?  @map("service_id") @db.Char(36)
+
+  pack              Pack?    @relation(fields: [packId], references: [packId])
+  service           Service? @relation(fields: [serviceId], references: [serviceId])
+
+  @@map("pack_items_services")
+}
+
+model Consent {
+  consentId    String       @id @default(uuid()) @map("consent_id") @db.Char(36)
+  clientId     String?      @map("client_id") @db.Char(36)
+  consentType  ConsentType? @map("consent_type")
+  accepted     Boolean?     @default(true)
+  acceptedAt   DateTime?    @map("accepted_at") @db.DateTime
+  documentUrl  String?      @map("document_url") @db.VarChar(255)
+  notes        String?      @db.VarChar(255)
+
+  client       Client?      @relation(fields: [clientId], references: [clientId])
+
+  @@unique([clientId, consentType], name: "unique_client_consent")
+  @@map("consents")
+}
+
+model Questionnaire {
+  questionnaryId String    @id @default(uuid()) @map("questionnary_id") @db.Char(36)
+  clientId       String?   @map("client_id") @db.Char(36)
+  title          String?   @db.VarChar(255)
+  answers        Json?     @db.Json
+  filledAt       DateTime? @map("filled_at") @db.DateTime
+  version        Int?
+
+  client         Client?   @relation(fields: [clientId], references: [clientId])
+
+  @@map("questionnaires")
+}
+
+model Revoke {
+  revokeId   String    @id @default(uuid()) @map("revoke_id") @db.Char(36)
+  clientId   String?   @map("client_id") @db.Char(36)
+  entityType String?   @map("entity_type") @db.VarChar(50)
+  entityId   String?   @map("entity_id") @db.Char(36)
+  reason     String?   @db.VarChar(255)
+  revokedAt  DateTime? @map("revoked_at") @db.DateTime
+
+  client     Client?   @relation(fields: [clientId], references: [clientId])
+
+  @@map("revokes")
+}
+
+model Status {
+  statusId    String    @id @default(uuid()) @map("status_id") @db.Char(36)
+  name        String?   @unique @db.VarChar(50)
+  conVARCHAR  String?   @map("conVARCHAR(255)") @db.VarChar(50)
+  description String?   @db.VarChar(255)
+
+  debts       Debt[]
+  carts       Cart[]
+  bookings    Booking[]
+
+  @@map("status")
+}
+
+model Coupon {
+  couponId      String         @id @default(uuid()) @map("coupon_id") @db.Char(36)
+  code          String?        @unique @db.VarChar(50)
+  description   String?        @db.VarChar(255)
+  discountType  String?        @map("discount_type") @db.VarChar(20)
+  discountValue Decimal?       @map("discount_value") @db.Decimal(10, 2)
+  minPurchase   Decimal?       @map("min_purchase") @db.Decimal(10, 2)
+  maxUses       Int?           @map("max_uses")
+  usedCount     Int?           @map("used_count")
+  validFrom     DateTime?      @map("valid_from") @db.DateTime
+  validUntil    DateTime?      @map("valid_until") @db.DateTime
+  isActive      Boolean?       @default(true) @map("is_active")
+  
+  cartItems     CartItemCoupon[]
+
+  @@map("coupons")
+}
+
+model Bonus {
+  bonusId       String          @id @default(uuid()) @map("bonus_id") @db.Char(36)
+  clientId      String?         @map("client_id") @db.Char(36)
+  name          String?         @db.VarChar(255)
+  serviceId     String?         @map("service_id") @db.Char(36)
+  totalSessions Int?            @map("total_sessions")
+  usedSessions  Int?            @map("used_sessions")
+  expiresAt     DateTime?       @map("expires_at") @db.Date
+  isActive      Boolean?        @default(true) @map("is_active")
+  createdAt     DateTime?       @map("created_at") @db.DateTime
+
+  client        Client?         @relation(fields: [clientId], references: [clientId])
+  service       Service?        @relation(fields: [serviceId], references: [serviceId])
+  cartItems     CartItemBonus[]
+
+  @@map("bonus")
+}
+
+model Giftcard {
+  giftcardId     String             @id @default(uuid()) @map("giftcard_id") @db.Char(36)
+  code           String?            @unique @db.VarChar(50)
+  clientId       String?            @map("client_id") @db.Char(36)
+  initialAmount  Decimal?           @map("initial_amount") @db.Decimal(10, 2)
+  currentBalance Decimal?           @map("current_balance") @db.Decimal(10, 2)
+  expiresAt      DateTime?          @map("expires_at") @db.Date
+  isActive       Boolean?           @default(true) @map("is_active")
+  createdAt      DateTime?          @map("created_at") @db.DateTime
+
+  client         Client?            @relation(fields: [clientId], references: [clientId])
+  cartItems      CartItemGiftcard[]
+
+  @@map("giftcards")
+}
+
+model Debt {
+  debtId          String    @id @default(uuid()) @map("debt_id") @db.Char(36)
+  clientId        String?   @map("client_id") @db.Char(36)
+  amount          Decimal?  @db.Decimal(10, 2)
+  remainingAmount Decimal?  @map("remaining_amount") @db.Decimal(10, 2)
+  statusId        String?   @map("status_id") @db.Char(36)
+  dueDate         DateTime? @map("due_date") @db.Date
+  createdAt       DateTime? @map("created_at") @db.DateTime
+  paidAt          DateTime? @map("paid_at") @db.DateTime
+
+  client          Client?   @relation(fields: [clientId], references: [clientId])
+  status          Status?   @relation(fields: [statusId], references: [statusId])
+
+  @@map("debts")
+}
+
+model Cart {
+  cartId      String            @id @default(uuid()) @map("cart_id") @db.Char(36)
+  clientId    String?           @map("client_id") @db.Char(36)
+  staffId     String?           @map("staff_id") @db.Char(36)
+  statusId    String?           @map("status_id") @db.Char(36)
+  createdAt   DateTime?         @map("created_at") @db.DateTime
+  updatedAt   DateTime?         @map("updated_at") @db.DateTime
+  completedAt DateTime?         @map("completed_at") @db.DateTime
+
+  client      Client?           @relation(fields: [clientId], references: [clientId])
+  status      Status?           @relation(fields: [statusId], references: [statusId])
+  products    CartItemProduct[]
+  services    CartItemService[]
+  packs       CartItemPack[]
+  coupons     CartItemCoupon[]
+  bonusItems  CartItemBonus[]
+  giftcards   CartItemGiftcard[]
+  bookings    Booking[]
+
+  @@map("carts")
+}
+
+model CartItemProduct {
+  cartItemProductId String   @id @default(uuid()) @map("cart_item_product_id") @db.Char(36)
+  cartId            String?  @map("cart_id") @db.Char(36)
+  productId         String?  @map("product_id") @db.Char(36)
+  quantity          Int?
+  unitPrice         Decimal? @map("unit_price") @db.Decimal(10, 2)
+
+  cart              Cart?    @relation(fields: [cartId], references: [cartId])
+  product           Product? @relation(fields: [productId], references: [productId])
+
+  @@map("cart_items_products")
+}
+
+model CartItemService {
+  cartItemServiceId String   @id @default(uuid()) @map("cart_item_service_id") @db.Char(36)
+  cartId            String?  @map("cart_id") @db.Char(36)
+  serviceId         String?  @map("service_id") @db.Char(36)
+  unitPrice         Decimal? @map("unit_price") @db.Decimal(10, 2)
+
+  cart              Cart?    @relation(fields: [cartId], references: [cartId])
+  service           Service? @relation(fields: [serviceId], references: [serviceId])
+
+  @@map("cart_items_services")
+}
+
+model CartItemPack {
+  cartItemPackId String   @id @default(uuid()) @map("cart_item_pack_id") @db.Char(36)
+  cartId         String?  @map("cart_id") @db.Char(36)
+  packId         String?  @map("pack_id") @db.Char(36)
+  unitPrice      Decimal? @map("unit_price") @db.Decimal(10, 2)
+
+  cart           Cart?    @relation(fields: [cartId], references: [cartId])
+  pack           Pack?    @relation(fields: [packId], references: [packId])
+
+  @@map("cart_items_packs")
+}
+
+model CartItemCoupon {
+  cartItemCouponId String   @id @default(uuid()) @map("cart_item_coupon_id") @db.Char(36)
+  cartId           String?  @map("cart_id") @db.Char(36)
+  couponId         String?  @map("coupon_id") @db.Char(36)
+  applied          Boolean? @default(true)
+
+  cart             Cart?    @relation(fields: [cartId], references: [cartId])
+  coupon           Coupon?  @relation(fields: [couponId], references: [couponId])
+
+  @@map("cart_items_coupons")
+}
+
+model CartItemBonus {
+  cartItemBonusId String   @id @default(uuid()) @map("cart_item_bonus_id") @db.Char(36)
+  cartId          String?  @map("cart_id") @db.Char(36)
+  bonusId         String?  @map("bonus_id") @db.Char(36)
+  sessionsUsed    Int?     @map("sessions_used")
+
+  cart            Cart?    @relation(fields: [cartId], references: [cartId])
+  bonus           Bonus?   @relation(fields: [bonusId], references: [bonusId])
+
+  @@map("cart_items_bonus")
+}
+
+model CartItemGiftcard {
+  cartItemGiftcardId String   @id @default(uuid()) @map("cart_item_giftcard_id") @db.Char(36)
+  cartId             String?  @map("cart_id") @db.Char(36)
+  giftcardId         String?  @map("giftcard_id") @db.Char(36)
+  amountUsed         Decimal? @map("amount_used") @db.Decimal(10, 2)
+
+  cart               Cart?    @relation(fields: [cartId], references: [cartId])
+  giftcard           Giftcard? @relation(fields: [giftcardId], references: [giftcardId])
+
+  @@map("cart_items_giftcard")
+}
+
+model Booking {
+  bookingId       String    @id @default(uuid()) @map("booking_id") @db.Char(36)
+  clientId        String?   @map("client_id") @db.Char(36)
+  serviceId       String?   @map("service_id") @db.Char(36)
+  packId          String?   @map("pack_id") @db.Char(36)
+  staffId         String?   @map("staff_id") @db.Char(36)
+  cartId          String?   @map("cart_id") @db.Char(36)
+  statusId        String?   @map("status_id") @db.Char(36)
+  scheduledAt     DateTime? @map("scheduled_at") @db.DateTime
+  durationMinutes Int?      @map("duration_minutes")
+  notes           String?   @db.VarChar(255)
+  createdAt       DateTime? @map("created_at") @db.DateTime
+  updatedAt       DateTime? @map("updated_at") @db.DateTime
+
+  client          Client?   @relation(fields: [clientId], references: [clientId])
+  service         Service?  @relation(fields: [serviceId], references: [serviceId])
+  pack            Pack?     @relation(fields: [packId], references: [packId])
+  cart            Cart?     @relation(fields: [cartId], references: [cartId])
+  status          Status?   @relation(fields: [statusId], references: [statusId])
+
+  @@map("bookings")
+}
+
+model Tag {
+  tagId    String       @id @default(uuid()) @map("tag_id") @db.Char(36)
+  name     String?      @unique @db.VarChar(50)
+  color    String?      @db.VarChar(7)
+  products ProductTag[]
+
+  @@map("tags")
+}
+
+model ProductTag {
+  productId String @map("product_id") @db.Char(36)
+  tagId     String @map("tag_id") @db.Char(36)
+
+  product   Product @relation(fields: [productId], references: [productId])
+  tag       Tag     @relation(fields: [tagId], references: [tagId])
+
+  @@id([productId, tagId])
+  @@map("product_tags")
 }
