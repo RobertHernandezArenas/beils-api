@@ -17,3 +17,11 @@ Follow the instructions in this repository(https://github.com/goldbergyoni/nodeb
 - **Language:** TypeScript (Strict Mode).
 - **Database:** MySQL + Prisma.
 - **Styles:** Tailwind CSS.
+- **Runtime:** Utiliza SIEMPRE Bun (https://bun.sh) como runtime de JavaScript/TypeScript por defecto.
+- **Gestor de Paquetes:** No uses npm, yarn ni pnpm. Usa exclusivamente comandos de `bun`.
+  - Instalación: `bun add <package>` (o `bun add -d` para dev).
+  - Ejecución de scripts: `bun run <script>`.
+  - Ejecución de archivos: `bun <file.ts>`.
+- **Ecosistema:** Si sugieres crear un proyecto nuevo, usa `bun init` o `bun create <template>`.
+- **Testing:** Prioriza `bun test` en lugar de Jest o Vitest, a menos que especifique lo contrario.
+- **Variables de Entorno:** Recuerda que Bun lee archivos `.env` de forma nativa, no sugieras instalar `dotenv`.

@@ -6,8 +6,14 @@ SELECT * FROM users;
 -- Desactivar verificación de llaves foráneas temporalmente para evitar errores de orden
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE TABLE users (
+  users_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+)
+
 CREATE TABLE clients (
-  client_id CHAR(36) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255) NOT NULL PRIMARY KEY,
   first_name VARCHAR(100),
   last_name VARCHAR(100),
   email VARCHAR(255) UNIQUE,
@@ -20,34 +26,34 @@ CREATE TABLE clients (
   country VARCHAR(100),
   created_at DATETIME,
   updated_at DATETIME,
-  is_active BOOLEAN DEFAULT true 
-);
+  is_active BOOLEAN DEFAULT true
+  );
 
 CREATE TABLE brands (
-  brand_id CHAR(36) NOT NULL PRIMARY KEY,
+  brand_id VARCHAR(255) NOT NULL PRIMARY KEY,
   name VARCHAR(100) UNIQUE,
   description VARCHAR(255),
   created_at DATETIME
 );
 
 CREATE TABLE categories (
-  category_id CHAR(36) NOT NULL PRIMARY KEY,
+  category_id VARCHAR(255) NOT NULL PRIMARY KEY,
   name VARCHAR(100) UNIQUE,
   description VARCHAR(255),
   type VARCHAR(20)
 );
 
 CREATE TABLE subcategories (
-  subcategory_id CHAR(36) NOT NULL PRIMARY KEY,
-  category_id CHAR(36),
+  subcategory_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  category_id VARCHAR(255),
   name VARCHAR(100),
   UNIQUE KEY unique_cat_name (category_id, name)
 );
 
 CREATE TABLE products (
-  product_id CHAR(36) NOT NULL PRIMARY KEY,
-  brand_id CHAR(36),
-  subcategory_id CHAR(36),
+  product_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  brand_id VARCHAR(255),
+  subcategory_id VARCHAR(255),
   name VARCHAR(255),
   description VARCHAR(255),
   sku VARCHAR(100) UNIQUE,
@@ -60,8 +66,8 @@ CREATE TABLE products (
 );
 
 CREATE TABLE services (
-  service_id CHAR(36) NOT NULL PRIMARY KEY,
-  subcategory_id CHAR(36), -- Corregido: Era integer en PG, debe coincidir con subcategories.id
+  service_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  subcategory_id VARCHAR(255), -- Corregido: Era integer en PG, debe coincidir con subcategories.id
   name VARCHAR(255),
   description VARCHAR(255),
   duration_minutes INTEGER,
@@ -72,7 +78,7 @@ CREATE TABLE services (
 );
 
 CREATE TABLE packs (
-  pack_id CHAR(36) NOT NULL PRIMARY KEY,
+  pack_id VARCHAR(255) NOT NULL PRIMARY KEY,
   name VARCHAR(255),
   description VARCHAR(255),
   price DECIMAL(10,2),
@@ -81,21 +87,21 @@ CREATE TABLE packs (
 );
 
 CREATE TABLE pack_items_products (
-  pack_item_product_id CHAR(36) NOT NULL PRIMARY KEY,
-  pack_id CHAR(36), -- Agregado: Faltaba en la definición original
-  product_id CHAR(36),
+  pack_item_product_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  pack_id VARCHAR(255), -- Agregado: Faltaba en la definición original
+  product_id VARCHAR(255),
   quantity INTEGER
 );
 
 CREATE TABLE pack_items_services (
-  pack_item_service_id CHAR(36) NOT NULL PRIMARY KEY,
-  pack_id CHAR(36), -- Agregado: Faltaba en la definición original
-  service_id CHAR(36)
+  pack_item_service_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  pack_id VARCHAR(255), -- Agregado: Faltaba en la definición original
+  service_id VARCHAR(255)
 );
 
 CREATE TABLE consents (
-  consent_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
+  consent_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
   consent_type ENUM('lgpd', 'indiba', 'laser'), -- Definido inline para MySQL
   accepted BOOLEAN DEFAULT true,
   accepted_at DATETIME,
@@ -105,8 +111,8 @@ CREATE TABLE consents (
 );
 
 CREATE TABLE questionnaires (
-  questionnary_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
+  questionnary_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
   title VARCHAR(255),
   answers JSON, -- jsonb pasa a JSON
   filled_at DATETIME,
@@ -114,23 +120,22 @@ CREATE TABLE questionnaires (
 );
 
 CREATE TABLE revokes (
-  revoke_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
+  revoke_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
   entity_type VARCHAR(50),
-  entity_id CHAR(36),
+  entity_id VARCHAR(255),
   reason VARCHAR(255),
   revoked_at DATETIME
 );
 
 CREATE TABLE status (
-  status_id CHAR(36) NOT NULL PRIMARY KEY,
-  name VARCHAR(50) UNIQUE COMMENT 'Ej: confirmado, pagado, cancelado',
-  conVARCHAR(255) VARCHAR(50),
+  status_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE,
   description VARCHAR(255)
 );
 
 CREATE TABLE coupons (
-  coupon_id CHAR(36) NOT NULL PRIMARY KEY,
+  coupon_id VARCHAR(255) NOT NULL PRIMARY KEY,
   code VARCHAR(50) UNIQUE,
   description VARCHAR(255),
   discount_type VARCHAR(20),
@@ -144,10 +149,10 @@ CREATE TABLE coupons (
 );
 
 CREATE TABLE bonus (
-  bonus_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
+  bonus_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
   name VARCHAR(255),
-  service_id CHAR(36),
+  service_id VARCHAR(255),
   total_sessions INTEGER,
   used_sessions INTEGER,
   expires_at DATE,
@@ -156,9 +161,9 @@ CREATE TABLE bonus (
 );
 
 CREATE TABLE giftcards (
-  giftcard_id CHAR(36) NOT NULL PRIMARY KEY,
+  giftcard_id VARCHAR(255) NOT NULL PRIMARY KEY,
   code VARCHAR(50) UNIQUE,
-  client_id CHAR(36),
+  client_id VARCHAR(255),
   initial_amount DECIMAL(10,2),
   current_balance DECIMAL(10,2),
   expires_at DATE,
@@ -167,77 +172,77 @@ CREATE TABLE giftcards (
 );
 
 CREATE TABLE debts (
-  debt_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
+  debt_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
   amount DECIMAL(10,2),
   remaining_amount DECIMAL(10,2),
-  status_id CHAR(36),
+  status_id VARCHAR(255),
   due_date DATE,
   created_at DATETIME,
   paid_at DATETIME
 );
 
 CREATE TABLE carts (
-  cart_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
-  staff_id CHAR(36),
-  status_id CHAR(36),
+  cart_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
+  staff_id VARCHAR(255),
+  status_id VARCHAR(255),
   created_at DATETIME,
   updated_at DATETIME,
   completed_at DATETIME
 );
 
 CREATE TABLE cart_items_products (
-  cart_item_product_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  product_id CHAR(36),
+  cart_item_product_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  product_id VARCHAR(255),
   quantity INTEGER,
   unit_price DECIMAL(10,2)
 );
 
 CREATE TABLE cart_items_services (
-  cart_item_service_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  service_id CHAR(36),
+  cart_item_service_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  service_id VARCHAR(255),
   unit_price DECIMAL(10,2)
 );
 
 CREATE TABLE cart_items_packs (
-  cart_item_pack_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  pack_id CHAR(36),
+  cart_item_pack_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  pack_id VARCHAR(255),
   unit_price DECIMAL(10,2)
 );
 
 CREATE TABLE cart_items_coupons (
-  cart_item_coupon_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  coupon_id CHAR(36),
+  cart_item_coupon_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  coupon_id VARCHAR(255),
   applied BOOLEAN DEFAULT true
 );
 
 CREATE TABLE cart_items_bonus (
-  cart_item_bonus_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  bonus_id CHAR(36),
+  cart_item_bonus_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  bonus_id VARCHAR(255),
   sessions_used INTEGER
 );
 
 CREATE TABLE cart_items_giftcard (
-  cart_item_giftcard_id CHAR(36) NOT NULL PRIMARY KEY,
-  cart_id CHAR(36),
-  giftcard_id CHAR(36),
+  cart_item_giftcard_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  cart_id VARCHAR(255),
+  giftcard_id VARCHAR(255),
   amount_used DECIMAL(10,2)
 );
 
 CREATE TABLE bookings (
-  booking_id CHAR(36) NOT NULL PRIMARY KEY,
-  client_id CHAR(36),
-  service_id CHAR(36),
-  pack_id CHAR(36),
-  staff_id CHAR(36),
-  cart_id CHAR(36),
-  status_id CHAR(36),
+  booking_id VARCHAR(255) NOT NULL PRIMARY KEY,
+  client_id VARCHAR(255),
+  service_id VARCHAR(255),
+  pack_id VARCHAR(255),
+  staff_id VARCHAR(255),
+  cart_id VARCHAR(255),
+  status_id VARCHAR(255),
   scheduled_at DATETIME,
   duration_minutes INTEGER,
   notes VARCHAR(255),
@@ -246,14 +251,14 @@ CREATE TABLE bookings (
 );
 
 CREATE TABLE tags (
-  tag_id CHAR(36) NOT NULL PRIMARY KEY,
+  tag_id VARCHAR(255) NOT NULL PRIMARY KEY,
   name VARCHAR(50) UNIQUE,
   color VARCHAR(7)
 );
 
 CREATE TABLE product_tags (
-  product_id CHAR(36),
-  tag_id CHAR(36)
+  product_id VARCHAR(255),
+  tag_id VARCHAR(255)
 );
 
 -- Definición de Foreign Keys

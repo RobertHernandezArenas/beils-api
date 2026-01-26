@@ -1,12 +1,12 @@
 import { validateInput } from '@/adapters/zod';
 
-export const validatorUserDataBody = validateInput();
+export const validatorClientDataBody = validateInput();
 
-export const UserSchema = validatorUserDataBody.object({
-	email: validatorUserDataBody
+export const ClientSchema = validatorClientDataBody.object({
+	email: validatorClientDataBody
 		.email({ error: 'El email no esta bien formado' })
 		.nonempty({ error: 'El email es obligatorio' }),
-	password: validatorUserDataBody
+	password: validatorClientDataBody
 		.string('La contraseña es obligatoria')
 		.min(6, 'La contraseña debe tener al menos 6 caracteres')
 		.max(36, 'La contraseña no debe exceder los 36 caracteres')

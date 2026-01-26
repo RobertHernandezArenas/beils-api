@@ -59,9 +59,9 @@ class UserController {
 
 	async findById(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { id } = request.params;
+			const { userId } = request.params;
 			const user = await prismaClient.user.findUnique({
-				where: { id },
+				where: { userId },
 			});
 
 			if (!user) {
@@ -74,7 +74,7 @@ class UserController {
 			}
 			response.status(200).json({
 				data: {
-					id: user.id,
+					id: user.userId,
 					email: user.email,
 				},
 			});
