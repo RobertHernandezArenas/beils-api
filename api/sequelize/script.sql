@@ -1,6 +1,6 @@
-CREATE DATABASE Beils_DB;
-USE Beils_DB;
-SELECT * FROM users;
+CREATE DATABASE beils_db;
+USE beils_db;
+
 -- DROP DATABASE beils_db;
 
 -- Desactivar verificación de llaves foráneas temporalmente para evitar errores de orden
@@ -9,25 +9,27 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE TABLE users (
   users_id VARCHAR(255) NOT NULL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-)
+  password VARCHAR(255) NOT NULL
+);
 
 CREATE TABLE clients (
   client_id VARCHAR(255) NOT NULL PRIMARY KEY,
   first_name VARCHAR(100),
   last_name VARCHAR(100),
-  email VARCHAR(255) UNIQUE,
+  email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(20),
   birth_date DATE,
   gender VARCHAR(20),
-  address VARCHAR(255) ,
+  document_type ENUM('PASSPORT', 'NIE', 'DNI') NOT NULL,
+  document_number VARCHAR(20) NOT NULL,
+  address VARCHAR(255),
   city VARCHAR(100),
   postal_code VARCHAR(20),
   country VARCHAR(100),
-  created_at DATETIME,
-  updated_at DATETIME,
-  is_active BOOLEAN DEFAULT true
-  );
+  is_active BOOLEAN DEFAULT true,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
 CREATE TABLE brands (
   brand_id VARCHAR(255) NOT NULL PRIMARY KEY,
@@ -102,7 +104,7 @@ CREATE TABLE pack_items_services (
 CREATE TABLE consents (
   consent_id VARCHAR(255) NOT NULL PRIMARY KEY,
   client_id VARCHAR(255),
-  consent_type ENUM('lgpd', 'indiba', 'laser'), -- Definido inline para MySQL
+  consent_type ENUM('LGPD', 'INDIBA', 'LASER'), -- Definido inline para MySQL
   accepted BOOLEAN DEFAULT true,
   accepted_at DATETIME,
   document_url VARCHAR(255),

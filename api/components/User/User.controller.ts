@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { adapters } from '@/adapters';
 import { buildLogger } from '@/utils/logger';
 import { prismaClient } from '../../../lib/prisma';
+import { CONFIG_GLOBALS } from '@/config';
 
 const logger = buildLogger('user.controller.ts');
 
@@ -84,60 +85,57 @@ class UserController {
 		}
 	}
 	async login(request: Request, response: Response, next: NextFunction) {
-		/*try {
-      const { email, password } = request.body;
-      
-      const user = await UserModel.findOne({ where: { email } });
+		try {
+			const { email, password } = request.body;
 
-      if (!user) {
-        return response.status(401).json({
-          error: {
-            code: 401,
-            type: 'NO_AUTORIZADO',
-            message: 'Credenciales inválidas',
-          },
-        });
-      }
+			const user = await prismaClient.user.findUnique({ where: { email } });
 
-      const isValidPassword = await adapters.encryptCompare(
-        password,
-        user.dataValues.password,
-      );
+			if (!user) {
+				return response.status(401).json({
+					error: {
+						code: 401,
+						type: 'NO_AUTORIZADO',
+						message: 'Credenciales inválidas',
+					},
+				});
+			}
 
-      if (!isValidPassword) {
-        return response.status(401).json({
-          error: {
-            code: 401,
-            type: 'NO_AUTORIZADO',
-            message: 'Credenciales inválidas',
-          },
-        });
-      }
+			const isValidPassword = await adapters.encryptCompare(
+				password,
+				user.password,
+			);
 
-      const token = adapters.generateToken(
-        {
-          id: user.dataValues.id,
-          email: user.dataValues.email,
+			if (!isValidPassword) {
+				return response.status(401).json({
+					error: {
+						code: 401,
+						type: 'NO_AUTORIZADO',
+						message: 'Credenciales inválidas',
+					},
+				});
+			}
+
+			const token = adapters.generateToken(
+				{
+					id: user.userId,
+					email: user.email,
         },
         CONFIG_GLOBALS.JWT.SECRET,
-        CONFIG_GLOBALS.JWT.DURATION,
-      );
+			);
 
-      response.status(200).json({
-        error: false,
-        data: {
-          user: {
-            id: user.dataValues.id,
-            email: user.dataValues.email,
-          },
-          token,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-    
-  }*/
+			response.status(200).json({
+				error: false,
+				data: {
+					user: {
+						id: user.userId,
+						email: user.email,
+					},
+					token,
+				},
+			});
+		} catch (error) {
+			next(error);
+		}
 	}
 }
 

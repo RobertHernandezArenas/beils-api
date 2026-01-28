@@ -5,8 +5,12 @@ import { ClientMiddleware } from './Client.middleware';
 export const ClientRouter: Router = Router()
 	.post(
 		'/',
-		ClientMiddleware.validatorClientDataBody,
 		clientController.create,
 	)
 	.get('/', clientController.findAll)
-	.get('/:id', clientController.findById);
+	.get('/inactive/all', clientController.findInactive)
+	.get('/:clientId', clientController.findById)
+	.patch('/:clientId', ClientMiddleware.validatorClientDataBody, clientController.update)
+	.delete('/:clientId', clientController.delete)
+	.delete('/hard/:clientId', clientController.hardDelete)
+	.patch('/restore/:clientId', clientController.restore);

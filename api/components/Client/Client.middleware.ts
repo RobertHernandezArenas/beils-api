@@ -21,10 +21,13 @@ export class ClientMiddleware {
 				// Retornamos un 400 Bad Request con los detalles formateados
 				return response.status(400).json({
 					status: 'error',
-					errors: error.issues, // Formato limpio: { email: ["Error..."] }
+					errors: error.issues.map(issue => ({
+						field: issue.path.join('.'),
+						message: issue.message,
+					})),
 				});
 			}
-			return error;
+			return next(error);
 		}
 	}
 }

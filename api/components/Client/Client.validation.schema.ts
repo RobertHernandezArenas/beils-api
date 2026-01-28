@@ -5,10 +5,20 @@ export const validatorClientDataBody = validateInput();
 export const ClientSchema = validatorClientDataBody.object({
 	email: validatorClientDataBody
 		.email({ error: 'El email no esta bien formado' })
-		.nonempty({ error: 'El email es obligatorio' }),
-	password: validatorClientDataBody
-		.string('La contraseña es obligatoria')
-		.min(6, 'La contraseña debe tener al menos 6 caracteres')
-		.max(36, 'La contraseña no debe exceder los 36 caracteres')
-		.nonempty({ error: 'La contraseña no debe estar vacía' }),
+		.nonempty('El email es obligatorio'),
+	firstName: validatorClientDataBody.string().optional(),
+	lastName: validatorClientDataBody.string().optional(),
+	phone: validatorClientDataBody
+		.string()
+		.nonempty('El teléfono es obligatorio'),
+	birthDate: validatorClientDataBody.date(),
+	documentType: validatorClientDataBody.enum(['PASAPORTE', 'NIE', 'DNI']),
+	documentNumber: validatorClientDataBody
+		.string()
+		.nonempty('El número de documento es obligatorio'),
+	gender: validatorClientDataBody.string().optional().default('FEMALE'),
+	address: validatorClientDataBody.string().optional(),
+	city: validatorClientDataBody.string().optional().default('A CORUÑA'),
+	postalCode: validatorClientDataBody.string().optional(),
+	country: validatorClientDataBody.string().optional().default('SPAIN'),
 });

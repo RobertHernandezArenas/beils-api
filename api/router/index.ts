@@ -1,3 +1,4 @@
+import { Client } from '@/components/Client';
 import { User } from '@/components/User';
 import { Request, Response, Router } from 'express';
 
@@ -7,6 +8,8 @@ export const APP_ROUTER = Router()
 	})
 
 	.use('/api/v1/user', User.Router)
+
+	.use('/api/v1/client', Client.Router)
 
 	.use('*', (request: Request, response: Response) => {
 		response.status(404).json({

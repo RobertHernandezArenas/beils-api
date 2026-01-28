@@ -13,9 +13,15 @@ datasource db {
   provider = "mysql"
 }
 enum ConsentType {
-  lgpd
-  indiba
-  laser
+  LGPD
+  INDIBA
+  LASER
+}
+
+enum DocumentType {
+  PASSPORT
+  NIE
+  DNI
 }
 
 model User {
@@ -35,6 +41,8 @@ model Client {
   phone         String?         @db.VarChar(20)
   birthDate     DateTime?       @map("birth_date") @db.Date
   gender        String?         @db.VarChar(20)
+  document_type DocumentType
+  document_number String        @db.VarChar(20)
   address       String?         @db.VarChar(255)
   city          String?         @db.VarChar(100)
   postalCode    String?         @map("postal_code") @db.VarChar(20)
@@ -42,7 +50,7 @@ model Client {
   createdAt     DateTime?       @map("created_at") @db.DateTime
   updatedAt     DateTime?       @map("updated_at") @db.DateTime
   isActive      Boolean?        @default(true) @map("is_active")
-  
+
   consents      Consent[]
   questionnaires Questionnaire[]
   bonus         Bonus[]
