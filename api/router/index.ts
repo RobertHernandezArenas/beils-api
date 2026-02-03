@@ -1,6 +1,8 @@
 import { Client } from '@/components/Client';
 import { User } from '@/components/User';
+import { buildLogger } from '@/utils/logger';
 import { Request, Response, Router } from 'express';
+const logger = buildLogger('api/router/index.ts');
 
 export const APP_ROUTER = Router()
 	.get('/', (request: Request, response: Response) => {
@@ -22,7 +24,7 @@ export const APP_ROUTER = Router()
 	})
 
 	.use((error: Error, request: Request, response: Response) => {
-		console.log(`[Server Error]: ${error.message}`);
+		logger.error(`[Server Error]: ${error.message}`);
 		response.status(500).json({
 			error: {
 				code: 500,

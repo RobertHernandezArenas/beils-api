@@ -9,28 +9,45 @@ const logger = buildLogger('user.controller.ts');
 class UserController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { email, password } = request.body;
+			const body = request.body;
 
 			// validamos si el usuario ya existe
-			const userData = await prismaClient.user.findUnique({
-				where: { email },
+			const userExist = await prismaClient.user.findUnique({
+				where: { email: body.email },
 			});
 
-			if (userData) {
-				logger.error(`El usuario con email ${email} ya existe`);
+			if (userExist) {
+				logger.error(`El usuario con email ${body.email} ya existe`);
 				return response.status(409).json({
 					error: {
 						code: 409,
-						type: 'CONFLICTO',
+						type: 'CONFLICTO CON LA BASE DE DATOS',
 					},
 				});
 			}
 
+			const newUser = {
+				email: body.email,
+				password: await adapters.encrypt(body.password, 10),
+				name: body.name,
+				surname: body.surname,
+        phone: body.phone,
+        role: 'CLIENT',
+				birthDate: body.birthDate
+					? new Date(body.birthDate)
+					: undefined,
+				document_type: !body.documentType ? 'DNI' : body.documentType,
+				document_number: body.documentNumber,
+				gender: !body.gender ? 'FEMALE' : body.gender,
+				address: body.address,
+				city: !body.city ? 'A CORUÑA' : body.city,
+				postalCode: body.postalCode,
+				country: !body.country ? 'SPAIN' : body.country,
+				isActive: true,
+			};
+
 			const user = await prismaClient.user.create({
-				data: {
-					email,
-					password: await adapters.encrypt(password, 10),
-				},
+				data: newUser,
 			});
 
 			response.status(201).json({
@@ -88,7 +105,9 @@ class UserController {
 		try {
 			const { email, password } = request.body;
 
-			const user = await prismaClient.user.findUnique({ where: { email } });
+			const user = await prismaClient.user.findUnique({
+				where: { email },
+			});
 
 			if (!user) {
 				return response.status(401).json({
@@ -119,8 +138,8 @@ class UserController {
 				{
 					id: user.userId,
 					email: user.email,
-        },
-        CONFIG_GLOBALS.JWT.SECRET,
+				},
+				CONFIG_GLOBALS.JWT.SECRET,
 			);
 
 			response.status(200).json({

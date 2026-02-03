@@ -6,8 +6,7 @@ import path from 'path';
 import { CONFIG_GLOBALS } from '@/config';
 import { APP_ROUTER } from '@router/index';
 
-
-export const appConfig = express()
+express()
 	.use(morgan('dev'))
 	.use(cors())
 	.use(express.json())
