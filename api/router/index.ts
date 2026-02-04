@@ -11,7 +11,7 @@ export const APP_ROUTER = Router()
 
 	.use('/api/v1/client', Client.Router)
 
-	.use('*', (request: Request, response: Response) => {
+	/*.use('*', (request: Request, response: Response) => {
 		response.status(404).json({
 			error: {
 				code: 404,
@@ -29,4 +29,4 @@ export const APP_ROUTER = Router()
 				type: 'ERROR_INTERNO_DEL_SERVIDOR',
 			},
 		});
-	});
+	});*/

@@ -1,64 +1,34 @@
 import { Request, Response, NextFunction } from 'express';
-import { adapters } from '@/adapters';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '../../../lib/prisma';
+import { prismaClient } from '@config/prisma';
+import { ClientSchema } from './Client.validation.schema';
+import { clientService } from './Client.service';
+import { CreateClientDto } from './Client.dto';
 
 const logger = buildLogger('client.controller.ts');
 
 class ClientController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
-			const {
-				firstName,
-				lastName,
-				email,
-				phone,
-				birthDate,
-				gender,
-				documentType,
-				documentNumber,
-				address,
-				city,
-				postalCode,
-				country,
-			} = request.body;
+			const dataClient = request.body;
+			const validatedData = await ClientSchema.parseAsync(dataClient);
 
-			if (email) {
-				// validamos si el cliente ya existe
-				const clientData = await prismaClient.client.findUnique({
-					where: { email },
+			// validamos si el usuario ya existe
+			const clientData = await prismaClient.client.findUnique({
+				where: { email: validatedData.email },
+			});
+
+			if (clientData) {
+				logger.error(`Cliente duplicado: ${validatedData.email}`);
+				return response.status(409).json({
+					error: {
+						code: 409,
+						type: 'CONFLICTO',
+					},
 				});
-
-				if (clientData) {
-					logger.error(`El usuario con email ${email} ya existe`);
-					return response.status(409).json({
-						error: {
-							code: 409,
-							type: 'CONFLICTO',
-						},
-					});
-				}
 			}
 
-			const newClient = {
-				email,
-				firstName,
-				lastName,
-				phone,
-				birthDate: birthDate ? new Date(birthDate) : undefined,
-				document_type: !documentType ? 'DNI' : documentType,
-				document_number: documentNumber,
-				gender: !gender ? 'FEMALE' : gender,
-				address,
-				city: !city ? 'A CORUÑA' : city,
-				postalCode,
-				country: !country ? 'SPAIN' : country,
-				isActive: true,
-			};
-
-			const client = await prismaClient.client.create({
-				data: newClient,
-			});
+			const client = await clientService.create(validatedData);
 
 			response.status(201).json({
 				error: false,
@@ -245,14 +215,16 @@ class ClientController {
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { clientId } = request.params;
-			const { birthDate, documentType, documentNumber, ...rest } =
+			const { birthDate, document_type, document_number, ...rest } =
 				request.body;
 
 			const data = {
 				...rest,
 				...(birthDate && { birthDate: new Date(birthDate) }),
-				...(documentType && { document_type: !documentType ? 'DNI' : documentType }),
-				...(documentNumber && { document_number: documentNumber }),
+				...(document_type && {
+					document_type: !document_type ? 'DNI' : document_type,
+				}),
+				...(document_number && { document_number: document_number }),
 			};
 
 			const client = await prismaClient.client.update({

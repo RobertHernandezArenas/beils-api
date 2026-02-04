@@ -11,9 +11,9 @@ export const ClientSchema = validatorClientDataBody.object({
 	phone: validatorClientDataBody
 		.string()
 		.nonempty('El teléfono es obligatorio'),
-	birthDate: validatorClientDataBody.date(),
-	documentType: validatorClientDataBody.enum(['PASAPORTE', 'NIE', 'DNI']),
-	documentNumber: validatorClientDataBody
+	birthDate: validatorClientDataBody.coerce.date(),
+	document_type: validatorClientDataBody.enum(['PASSPORT', 'NIE', 'DNI']),
+	document_number: validatorClientDataBody
 		.string()
 		.nonempty('El número de documento es obligatorio'),
 	gender: validatorClientDataBody.string().optional().default('FEMALE'),

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { adapters } from '@/adapters';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '../../../lib/prisma';
+import { prismaClient } from '@config/prisma';
 import { CONFIG_GLOBALS } from '@/config';
 
 const logger = buildLogger('user.controller.ts');
