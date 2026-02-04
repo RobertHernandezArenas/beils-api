@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '@config/prisma';
+import { prismaClient } from '@/config/database/orm/prisma';
 import { ClientSchema } from './Client.validation.schema';
 import { clientService } from './Client.service';
 import { CreateClientDto } from './Client.dto';
@@ -180,9 +180,9 @@ class ClientController {
 
 	async findById(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { clientId } = request.params;
+			const { client_id } = request.params;
 			const client = await prismaClient.client.findUnique({
-				where: { clientId },
+				where: { client_id },
 				include: {
 					consents: true,
 					questionnaires: true,
@@ -214,7 +214,7 @@ class ClientController {
 
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { clientId } = request.params;
+			const { client_id } = request.params;
 			const { birthDate, document_type, document_number, ...rest } =
 				request.body;
 
@@ -228,7 +228,7 @@ class ClientController {
 			};
 
 			const client = await prismaClient.client.update({
-				where: { clientId },
+				where: { client_id },
 				data,
 			});
 			response.status(200).json({
@@ -242,10 +242,10 @@ class ClientController {
 
 	async delete(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { clientId } = request.params;
+			const { client_id } = request.params;
 			await prismaClient.client.update({
-				where: { clientId },
-				data: { isActive: false },
+				where: { client_id },
+				data: { is_active: false },
 			});
 			response.status(204).send();
 		} catch (error) {
@@ -256,9 +256,9 @@ class ClientController {
 
 	async hardDelete(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { clientId } = request.params;
+			const { client_id } = request.params;
 			await prismaClient.client.delete({
-				where: { clientId },
+				where: { client_id },
 			});
 			response.status(204).send();
 		} catch (error) {
@@ -269,10 +269,10 @@ class ClientController {
 
 	async restore(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { clientId } = request.params;
+			const { client_id } = request.params;
 			const client = await prismaClient.client.update({
-				where: { clientId },
-				data: { isActive: true },
+				where: { client_id },
+				data: { is_active: true },
 			});
 			response.status(200).json({
 				data: client,

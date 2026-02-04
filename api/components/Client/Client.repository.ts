@@ -1,5 +1,5 @@
-import { Prisma, Client } from '@/generated/prisma/client/client';
-import { prismaClient } from '@config/prisma';
+import { Prisma, Client } from '@orm/prisma/generated/client';
+import { prismaClient } from '@/config/database/orm/prisma';
 
 export class ClientRepository {
 	async create(data: Prisma.ClientCreateInput): Promise<Client> {
@@ -10,8 +10,8 @@ export class ClientRepository {
 		return prismaClient.client.findUnique({ where: { email } });
 	}
 
-	async findById(clientId: string): Promise<Client | null> {
-		return prismaClient.client.findUnique({ where: { clientId } });
+	async findById(client_id: string): Promise<Client | null> {
+		return prismaClient.client.findUnique({ where: { client_id } });
 	}
 
 	async findAll(): Promise<Client[]> {
@@ -19,13 +19,13 @@ export class ClientRepository {
 	}
 
 	async update(
-		clientId: string,
+		client_id: string,
 		data: Prisma.ClientUpdateInput,
 	): Promise<Client> {
-		return prismaClient.client.update({ where: { clientId }, data });
+		return prismaClient.client.update({ where: { client_id }, data });
 	}
 
-	async delete(clientId: string): Promise<Client> {
-		return prismaClient.client.delete({ where: { clientId } });
+	async delete(client_id: string): Promise<Client> {
+		return prismaClient.client.delete({ where: { client_id } });
 	}
 }

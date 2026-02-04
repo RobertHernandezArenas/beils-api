@@ -6,8 +6,8 @@ export const ClientSchema = validatorClientDataBody.object({
 	email: validatorClientDataBody
 		.email({ error: 'El email no esta bien formado' })
 		.nonempty('El email es obligatorio'),
-	firstName: validatorClientDataBody.string().optional(),
-	lastName: validatorClientDataBody.string().optional(),
+	name: validatorClientDataBody.string().optional(),
+	surname: validatorClientDataBody.string().optional(),
 	phone: validatorClientDataBody
 		.string()
 		.nonempty('El teléfono es obligatorio'),

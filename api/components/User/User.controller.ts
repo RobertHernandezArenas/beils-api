@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { adapters } from '@/adapters';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '@config/prisma';
+import { prismaClient } from '@/config/database/orm/prisma';
 import { CONFIG_GLOBALS } from '@/config';
 
 const logger = buildLogger('user.controller.ts');
@@ -88,7 +88,9 @@ class UserController {
 		try {
 			const { email, password } = request.body;
 
-			const user = await prismaClient.user.findUnique({ where: { email } });
+			const user = await prismaClient.user.findUnique({
+				where: { email },
+			});
 
 			if (!user) {
 				return response.status(401).json({
@@ -119,8 +121,8 @@ class UserController {
 				{
 					id: user.userId,
 					email: user.email,
-        },
-        CONFIG_GLOBALS.JWT.SECRET,
+				},
+				CONFIG_GLOBALS.JWT.SECRET,
 			);
 
 			response.status(200).json({
