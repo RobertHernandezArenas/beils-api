@@ -11,7 +11,8 @@ class ClientController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
 			const dataClient = request.body;
-			const validatedData = await ClientSchema.parseAsync(dataClient);
+			const validatedData: CreateClientDto =
+				await ClientSchema.parseAsync(dataClient);
 
 			const client = await clientService.create(validatedData);
 
