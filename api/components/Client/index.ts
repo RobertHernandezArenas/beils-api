@@ -1,6 +1,6 @@
 import { clientController } from './Client.controller';
 import { ClientRouter } from './Client.router';
-import { ClientSchema } from './Client.validation.schema';
+import { ClientSchema } from './Client.schema';
 
 export const Client = {
 	Router: ClientRouter,

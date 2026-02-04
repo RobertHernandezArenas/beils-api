@@ -1,11 +1,8 @@
 import { ClientRepository } from './Client.repository';
-import {
-	Prisma,
-	Client,
-	document_type,
-} from '@/generated/prisma/client/client';
+import { Prisma, Client, DocumentType } from '@config/prisma/generated/client';
 import { AppError } from '../../middlewares/errorHandler';
 import { CreateClientDto } from './Client.dto';
+import { adapters } from '@/adapters';
 
 export class ClientService {
 	private clientRepository: ClientRepository;
@@ -26,33 +23,118 @@ export class ClientService {
 
 		const newClient: Prisma.ClientCreateInput = {
 			email: data.email,
-			firstName: data.firstName,
-			lastName: data.lastName,
+			password: await adapters.encrypt(data.password, 10),
+			name: data.name,
+			surname: data.surname,
 			phone: data.phone,
-			birthDate: data.birthDate,
-			document_type: data.document_type as document_type,
+			mobile: data.mobile,
+			birth_date: data.birthDate,
+			document_type: data.document_type as DocumentType,
 			document_number: data.document_number,
 			gender: data.gender,
 			address: data.address,
 			city: data.city,
-			postalCode: data.postalCode,
+			zip_code: data.postalCode,
 			country: data.country,
-			isActive: true,
+			is_active: true,
 		};
 
 		return this.clientRepository.create(newClient);
 	}
 
 	async findById(userId: string): Promise<Client> {
-		const client = await this.clientRepository.findById(userId);
-		if (!client) {
+		const client = await this.clientRepository.findAll({
+			where: { client_id: userId },
+			include: {
+				consents: true,
+				questionnaires: true,
+				bonus: true,
+				giftcards: true,
+				debts: true,
+				carts: true,
+				bookings: true,
+				revokes: true,
+			},
+		});
+
+		if (!client[0]) {
 			throw new AppError('User not found', 404);
 		}
-		return client;
+		return client[0];
 	}
 
-	async findAll(): Promise<Client[]> {
-		return this.clientRepository.findAll();
+	async findAll(name?: string): Promise<Client[]> {
+		const where: Prisma.ClientWhereInput = {
+			is_active: true,
+		};
+
+		if (name) {
+			where.OR = [
+				{ name: { contains: name } },
+				{ surname: { contains: name } },
+				{ email: { contains: name } },
+				{ phone: { contains: name } },
+			];
+		}
+
+		return this.clientRepository.findAll({
+			where,
+			include: {
+				consents: true,
+				questionnaires: true,
+				bonus: true,
+				giftcards: true,
+				debts: true,
+				carts: true,
+				bookings: true,
+				revokes: true,
+			},
+		});
+	}
+
+	async findInactive(name?: string): Promise<Client[]> {
+		const where: Prisma.ClientWhereInput = {
+			is_active: false,
+		};
+
+		if (name) {
+			where.OR = [
+				{ name: { contains: name } },
+				{ surname: { contains: name } },
+				{ email: { contains: name } },
+				{ phone: { contains: name } },
+			];
+		}
+
+		return this.clientRepository.findAll({
+			where,
+			include: {
+				consents: true,
+				questionnaires: true,
+				bonus: true,
+				giftcards: true,
+				debts: true,
+				carts: true,
+				bookings: true,
+				revokes: true,
+			},
+		});
+	}
+
+	async update(id: string, data: Prisma.ClientUpdateInput): Promise<Client> {
+		return this.clientRepository.update(id, data);
+	}
+
+	async delete(id: string): Promise<void> {
+		await this.clientRepository.update(id, { is_active: false });
+	}
+
+	async hardDelete(id: string): Promise<void> {
+		await this.clientRepository.delete(id);
+	}
+
+	async restore(id: string): Promise<Client> {
+		return this.clientRepository.update(id, { is_active: true });
 	}
 }
 

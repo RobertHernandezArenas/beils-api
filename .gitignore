@@ -130,5 +130,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-api/config/database/orm/prisma/generated
+api/config/prisma/generated
 
+
+/prisma/api/config/prisma/generated/prisma

@@ -1,5 +1,5 @@
-import { Prisma, Client } from '@orm/prisma/generated/client';
-import { prismaClient } from '@/config/database/orm/prisma';
+import { Prisma, Client } from '@config/prisma/generated/client';
+import { prismaClient } from '@/config/prisma';
 
 export class ClientRepository {
 	async create(data: Prisma.ClientCreateInput): Promise<Client> {
@@ -14,8 +14,12 @@ export class ClientRepository {
 		return prismaClient.client.findUnique({ where: { client_id } });
 	}
 
-	async findAll(): Promise<Client[]> {
-		return prismaClient.client.findMany();
+	async findAll(params?: {
+		where?: Prisma.ClientWhereInput;
+		include?: Prisma.ClientInclude;
+	}): Promise<Client[]> {
+		const { where, include } = params || {};
+		return prismaClient.client.findMany({ where, include });
 	}
 
 	async update(

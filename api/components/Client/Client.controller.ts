@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '@/config/database/orm/prisma';
-import { ClientSchema } from './Client.validation.schema';
+import { prismaClient } from '@/config/prisma';
+import { ClientSchema } from './Client.schema';
 import { clientService } from './Client.service';
 import { CreateClientDto } from './Client.dto';
 
@@ -12,21 +12,6 @@ class ClientController {
 		try {
 			const dataClient = request.body;
 			const validatedData = await ClientSchema.parseAsync(dataClient);
-
-			// validamos si el usuario ya existe
-			const clientData = await prismaClient.client.findUnique({
-				where: { email: validatedData.email },
-			});
-
-			if (clientData) {
-				logger.error(`Cliente duplicado: ${validatedData.email}`);
-				return response.status(409).json({
-					error: {
-						code: 409,
-						type: 'CONFLICTO',
-					},
-				});
-			}
 
 			const client = await clientService.create(validatedData);
 
