@@ -3,6 +3,9 @@ import { Prisma, Client, DocumentType } from '@config/prisma/generated/client';
 import { AppError } from '../../middlewares/errorHandler';
 import { CreateClientDto } from './Client.dto';
 import { adapters } from '@/adapters';
+import { buildLogger } from '@/utils/logger';
+
+const logger = buildLogger('client.controller.ts');
 
 export class ClientService {
 	private clientRepository: ClientRepository;
@@ -17,7 +20,8 @@ export class ClientService {
 				data.email,
 			);
 			if (existingUser) {
-				throw new AppError('Email already exists', 409);
+				logger.error(`Cliente duplicado: ${data.email}`);
+				throw new AppError('CONFLICT', 409);
 			}
 		}
 

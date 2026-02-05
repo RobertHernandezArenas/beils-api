@@ -21,7 +21,6 @@ class ClientController {
 				data: client,
 			});
 		} catch (error) {
-			logger.error((error as Error).message);
 			next(error);
 		}
 	}
