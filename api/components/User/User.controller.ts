@@ -1,37 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { adapters } from '@/adapters';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '@/config/prisma';
-import { CONFIG_GLOBALS } from '@/config';
+import { userService } from './User.service';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from './User.dto';
+import {
+	CreateUserSchema,
+	LoginUserSchema,
+	UpdateUserSchema,
+} from './User.schema';
 
 const logger = buildLogger('user.controller.ts');
 
 class UserController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { email, password } = request.body;
+			const data = request.body;
+			const validatedData: CreateUserDto =
+				await CreateUserSchema.parseAsync(data);
 
-			// validamos si el usuario ya existe
-			const userData = await prismaClient.user.findUnique({
-				where: { email },
-			});
-
-			if (userData) {
-				logger.error(`El usuario con email ${email} ya existe`);
-				return response.status(409).json({
-					error: {
-						code: 409,
-						type: 'CONFLICTO',
-					},
-				});
-			}
-
-			const user = await prismaClient.user.create({
-				data: {
-					email,
-					password: await adapters.encrypt(password, 10),
-				},
-			});
+			const user = await userService.create(validatedData);
 
 			response.status(201).json({
 				error: false,
@@ -45,7 +31,7 @@ class UserController {
 
 	async findAll(request: Request, response: Response, next: NextFunction) {
 		try {
-			const users = (await prismaClient.user.findMany()) || [];
+			const users = await userService.findAll();
 			response.status(200).json({
 				data: users,
 				meta: {
@@ -60,80 +46,57 @@ class UserController {
 
 	async findById(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { user_id } = request.params;
-			const user = await prismaClient.user.findUnique({
-				where: { user_id },
-			});
-
-			if (!user) {
-				return response.status(404).json({
-					error: {
-						code: 404,
-						type: 'NO_ENCONTRADO',
-					},
-				});
-			}
+			const { id } = request.params;
+			const user = await userService.findById(id);
 			response.status(200).json({
-				data: {
-					id: user.user_id,
-					email: user.email,
-				},
+				data: user,
 			});
 		} catch (error) {
 			logger.error((error as Error).message);
 			next(error);
 		}
 	}
+
+	async update(request: Request, response: Response, next: NextFunction) {
+		try {
+			const { id } = request.params;
+			const data = request.body;
+			const validatedData: UpdateUserDto =
+				await UpdateUserSchema.parseAsync(data);
+
+			const user = await userService.update(id, validatedData);
+
+			response.status(200).json({
+				data: user,
+			});
+		} catch (error) {
+			logger.error((error as Error).message);
+			next(error);
+		}
+	}
+
+	async delete(request: Request, response: Response, next: NextFunction) {
+		try {
+			const { id } = request.params;
+			await userService.delete(id);
+			response.status(204).send();
+		} catch (error) {
+			logger.error((error as Error).message);
+			next(error);
+		}
+	}
+
 	async login(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { email, password } = request.body;
+			const data = request.body;
+			const validatedData: LoginUserDto =
+				await LoginUserSchema.parseAsync(data);
 
-			const user = await prismaClient.user.findUnique({
-				where: { email },
-			});
-
-			if (!user) {
-				return response.status(401).json({
-					error: {
-						code: 401,
-						type: 'NO_AUTORIZADO',
-						message: 'Credenciales inválidas',
-					},
-				});
-			}
-
-			const isValidPassword = await adapters.encryptCompare(
-				password,
-				user.password,
-			);
-
-			if (!isValidPassword) {
-				return response.status(401).json({
-					error: {
-						code: 401,
-						type: 'NO_AUTORIZADO',
-						message: 'Credenciales inválidas',
-					},
-				});
-			}
-
-			const token = adapters.generateToken(
-				{
-					id: user.user_id,
-					email: user.email,
-				},
-				CONFIG_GLOBALS.JWT.SECRET,
-			);
+			const result = await userService.login(validatedData);
 
 			response.status(200).json({
 				error: false,
-				data: {
-					user: {
-						id: user.user_id,
-						email: user.email,
-					},
-					token,
-				},
+				data: result,
 			});
 		} catch (error) {
 			next(error);

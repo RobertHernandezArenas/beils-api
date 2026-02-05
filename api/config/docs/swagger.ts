@@ -18,11 +18,11 @@ const swaggerDefinition = {
 	basePath: '/api/v1',
 	servers: [
 		{
-			url: `${process.env.SERVER1}/beils/v1/dev/`,
+			url: '/api/v1/',
 			description: 'Beils Development Server',
 		},
 		{
-			url: `${process.env.SERVER1}/beils/v1/pro/`,
+			url: '/api/v1/pro/',
 			description: 'Beils Production Server',
 		},
 	],
@@ -104,7 +104,8 @@ const swaggerDefinition = {
 
 const options = {
 	swaggerDefinition,
-	apis: ['src/router/*.ts'],
+	// Updated to match project structure: components/**/router
+	apis: ['./api/components/**/*.router.ts', './api/router/*.ts'],
 };
 
 export const openAPIConfiguration = swaggerJSDOC(options);

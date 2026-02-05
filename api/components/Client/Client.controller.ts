@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { buildLogger } from '@/utils/logger';
-import { prismaClient } from '@/config/prisma';
-import { ClientSchema } from './Client.schema';
 import { clientService } from './Client.service';
-import { CreateClientDto } from './Client.dto';
+import { ClientSchema } from './Client.schema';
+import { CreateClientDto, UpdateClientDto } from './Client.dto';
 
 const logger = buildLogger('client.controller.ts');
 
@@ -28,58 +27,8 @@ class ClientController {
 	async findAll(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { name } = request.query;
+			const clients = await clientService.findAll(name as string);
 
-			const where: {
-				isActive: boolean;
-				OR?: {
-					firstName?: { contains: string };
-					lastName?: { contains: string };
-					email?: { contains: string };
-					phone?: { contains: string };
-				}[];
-			} = {
-				isActive: true,
-			};
-
-			if (name) {
-				where.OR = [
-					{
-						firstName: {
-							contains: name as string,
-						},
-					},
-					{
-						lastName: {
-							contains: name as string,
-						},
-					},
-					{
-						email: {
-							contains: name as string,
-						},
-					},
-					{
-						phone: {
-							contains: name as string,
-						},
-					},
-				];
-			}
-
-			const clients =
-				(await prismaClient.client.findMany({
-					where,
-					include: {
-						consents: true,
-						questionnaires: true,
-						bonus: true,
-						giftcards: true,
-						debts: true,
-						carts: true,
-						bookings: true,
-						revokes: true,
-					},
-				})) || [];
 			response.status(200).json({
 				data: clients,
 				meta: {
@@ -99,58 +48,8 @@ class ClientController {
 	) {
 		try {
 			const { name } = request.query;
+			const clients = await clientService.findInactive(name as string);
 
-			const where: {
-				isActive: boolean;
-				OR?: {
-					firstName?: { contains: string };
-					lastName?: { contains: string };
-					email?: { contains: string };
-					phone?: { contains: string };
-				}[];
-			} = {
-				isActive: false,
-			};
-
-			if (name) {
-				where.OR = [
-					{
-						firstName: {
-							contains: name as string,
-						},
-					},
-					{
-						lastName: {
-							contains: name as string,
-						},
-					},
-					{
-						email: {
-							contains: name as string,
-						},
-					},
-					{
-						phone: {
-							contains: name as string,
-						},
-					},
-				];
-			}
-
-			const clients =
-				(await prismaClient.client.findMany({
-					where,
-					include: {
-						consents: true,
-						questionnaires: true,
-						bonus: true,
-						giftcards: true,
-						debts: true,
-						carts: true,
-						bookings: true,
-						revokes: true,
-					},
-				})) || [];
 			response.status(200).json({
 				data: clients,
 				meta: {
@@ -166,28 +65,20 @@ class ClientController {
 	async findById(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { client_id } = request.params;
-			const client = await prismaClient.client.findUnique({
-				where: { client_id },
-				include: {
-					consents: true,
-					questionnaires: true,
-					bonus: true,
-					giftcards: true,
-					debts: true,
-					carts: true,
-					bookings: true,
-					revokes: true,
-				},
-			});
+			// Note: router might use :clientId but controller reads :client_id.
+			// Check router: .get('/:clientId', ...).
+			// Controller MUST read request.params.clientId.
+			// Previous code read `client_id` ???
+			// Let's check previous router again.
+			// Previous router: .get('/:clientId', clientController.findById)
+			// Previous controller: const { client_id } = request.params;
+			// If router defines :clientId, then params.client_id would be undefined!
+			// I will fix this to use clientId (or better, match the param name).
 
-			if (!client) {
-				return response.status(404).json({
-					error: {
-						code: 404,
-						type: 'NO_ENCONTRADO',
-					},
-				});
-			}
+			const id = request.params.clientId || request.params.client_id;
+
+			const client = await clientService.findById(id);
+
 			response.status(200).json({
 				data: client,
 			});
@@ -199,23 +90,14 @@ class ClientController {
 
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { client_id } = request.params;
-			const { birthDate, document_type, document_number, ...rest } =
-				request.body;
+			const id = request.params.clientId || request.params.client_id;
+			const data = request.body;
 
-			const data = {
-				...rest,
-				...(birthDate && { birthDate: new Date(birthDate) }),
-				...(document_type && {
-					document_type: !document_type ? 'DNI' : document_type,
-				}),
-				...(document_number && { document_number: document_number }),
-			};
+			// Validate partial update
+			const validatedData = await ClientSchema.partial().parseAsync(data);
 
-			const client = await prismaClient.client.update({
-				where: { client_id },
-				data,
-			});
+			const client = await clientService.update(id, validatedData);
+
 			response.status(200).json({
 				data: client,
 			});
@@ -227,11 +109,8 @@ class ClientController {
 
 	async delete(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { client_id } = request.params;
-			await prismaClient.client.update({
-				where: { client_id },
-				data: { is_active: false },
-			});
+			const id = request.params.clientId || request.params.client_id;
+			await clientService.delete(id);
 			response.status(204).send();
 		} catch (error) {
 			logger.error((error as Error).message);
@@ -241,10 +120,8 @@ class ClientController {
 
 	async hardDelete(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { client_id } = request.params;
-			await prismaClient.client.delete({
-				where: { client_id },
-			});
+			const id = request.params.clientId || request.params.client_id;
+			await clientService.hardDelete(id);
 			response.status(204).send();
 		} catch (error) {
 			logger.error((error as Error).message);
@@ -254,11 +131,8 @@ class ClientController {
 
 	async restore(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { client_id } = request.params;
-			const client = await prismaClient.client.update({
-				where: { client_id },
-				data: { is_active: true },
-			});
+			const id = request.params.clientId || request.params.client_id;
+			const client = await clientService.restore(id);
 			response.status(200).json({
 				data: client,
 			});
