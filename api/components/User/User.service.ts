@@ -85,6 +85,7 @@ export class UserService {
 			{
 				id: user.user_id,
 				email: user.email,
+				role: user.role,
 			},
 			CONFIG_GLOBALS.JWT.SECRET,
 		);

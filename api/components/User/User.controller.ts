@@ -24,7 +24,7 @@ class UserController {
 				data: user,
 			});
 		} catch (error) {
-			logger.error((error as Error).message);
+			// logger.error((error as Error).message);
 			next(error);
 		}
 	}
@@ -33,7 +33,7 @@ class UserController {
 		try {
 			const users = await userService.findAll();
 			response.status(200).json({
-				data: users,
+				data: { users },
 				meta: {
 					total: users.length,
 				},

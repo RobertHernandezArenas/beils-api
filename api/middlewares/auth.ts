@@ -1,6 +1,6 @@
+import { verifyToken } from '@/adapters/jwt';
 import { CONFIG_GLOBALS } from '@/config';
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 
 // Extend Express Request to include user
 declare global {
@@ -29,7 +29,7 @@ export const isAuthenticated = (
 	}
 
 	try {
-		const decoded = jwt.verify(token, CONFIG_GLOBALS.JWT.SECRET);
+		const decoded = verifyToken(token, CONFIG_GLOBALS.JWT.SECRET);
 		req.user = decoded;
 		next();
 	} catch (error) {
