@@ -1,5 +1,6 @@
-import { userController } from './User.controller';
+import { checkRole, isAuthenticated } from '@/middlewares/auth';
 import { Router } from 'express';
+import { userController } from './User.controller';
 
 export const UserRouter: Router = Router()
 	/**
@@ -155,7 +156,7 @@ export const UserRouter: Router = Router()
 	 *                     total:
 	 *                       type: integer
 	 */
-	.get('/', userController.findAll)
+	.get('/', isAuthenticated, checkRole(['ADMIN']), userController.findAll)
 
 	/**
 	 * @swagger
@@ -190,7 +191,7 @@ export const UserRouter: Router = Router()
 	 *       404:
 	 *         description: Usuario no encontrado
 	 */
-	.get('/:id', userController.findById)
+	.get('/:id', isAuthenticated, checkRole(['ADMIN']), userController.findById)
 
 	/**
 	 * @swagger
@@ -233,7 +234,7 @@ export const UserRouter: Router = Router()
 	 *       404:
 	 *         description: Usuario no encontrado
 	 */
-	.put('/:id', userController.update)
+	.put('/:id', isAuthenticated, checkRole(['ADMIN']), userController.update)
 
 	/**
 	 * @swagger
@@ -256,4 +257,9 @@ export const UserRouter: Router = Router()
 	 *       404:
 	 *         description: Usuario no encontrado
 	 */
-	.delete('/:id', userController.delete);
+	.delete(
+		'/:id',
+		isAuthenticated,
+		checkRole(['ADMIN']),
+		userController.delete,
+	);

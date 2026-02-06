@@ -1,3 +1,4 @@
+import { CONFIG_GLOBALS } from '@/config';
 import swaggerJSDOC from 'swagger-jsdoc';
 
 const swaggerDefinition = {
@@ -14,20 +15,14 @@ const swaggerDefinition = {
 			url: 'http://www.apache.org/licenses/LICENSE-2.0.html',
 		},
 	},
-	host: 'https://apieverywhere.com',
-	basePath: '/api/v1',
 	servers: [
 		{
-			url: '/api/v1/',
-			description: 'Beils Development Server',
-		},
-		{
-			url: '/api/v1/pro/',
-			description: 'Beils Production Server',
+			url: `${CONFIG_GLOBALS.SERVER}:${CONFIG_GLOBALS.PORT}${CONFIG_GLOBALS.API_SERVER_PREFIX}/${CONFIG_GLOBALS.API_SERVER_VERSION}`,
+			description: `Beils ${CONFIG_GLOBALS.ENVIRONMENT} Server`,
 		},
 	],
 	components: {
-		seccuritySchemes: {
+		securitySchemes: {
 			bearerAuth: {
 				type: 'http',
 				scheme: 'bearer',
@@ -100,11 +95,15 @@ const swaggerDefinition = {
 			},
 		},
 	},
+	security: [
+		{
+			bearerAuth: [],
+		},
+	],
 };
 
 const options = {
 	swaggerDefinition,
-	// Updated to match project structure: components/**/router
 	apis: ['./api/components/**/*.router.ts', './api/router/*.ts'],
 };
 

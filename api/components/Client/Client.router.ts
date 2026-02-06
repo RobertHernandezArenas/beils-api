@@ -1,11 +1,10 @@
+import { checkRole, isAuthenticated } from '@/middlewares/auth';
 import { Router } from 'express';
 import { clientController } from './Client.controller';
 
 export const ClientRouter: Router = Router()
-	.post(
-		'/',
-		clientController.create,
-	)
+	.use(isAuthenticated, checkRole(['ADMIN']))
+	.post('/', clientController.create)
 	.get('/', clientController.findAll)
 	.get('/inactive/all', clientController.findInactive)
 	.get('/:clientId', clientController.findById)

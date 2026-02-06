@@ -10,17 +10,23 @@ import { errorHandler } from './middlewares/errorHandler';
 import swaggerUi from 'swagger-ui-express';
 import { openAPIConfiguration } from '@/config/docs/swagger';
 
+const API_PREFIX = `${CONFIG_GLOBALS.API_SERVER_PREFIX}/${CONFIG_GLOBALS.API_SERVER_VERSION}`;
+
 express()
 	.use(morgan('dev'))
 	.use(cors())
 	.use(express.json())
 	.use(express.urlencoded({ extended: true }))
-	.use(express.static(path.join(__dirname, 'public')))
-	.use('/api/v1/', swaggerUi.serve, swaggerUi.setup(openAPIConfiguration))
+	.use(express.static(path.join(__dirname, '../public')))
+	.use(
+		`${API_PREFIX}/docs`,
+		swaggerUi.serve,
+		swaggerUi.setup(openAPIConfiguration),
+	)
 	.use(APP_ROUTER)
 	.use(errorHandler)
 	.listen(CONFIG_GLOBALS.PORT, () =>
 		console.log(
-			`🚀 Server running: http://localhost:${CONFIG_GLOBALS.PORT}`,
+			`🚀 Server running: ${CONFIG_GLOBALS.SERVER}:${CONFIG_GLOBALS.PORT}${API_PREFIX}`,
 		),
 	);

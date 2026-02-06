@@ -1,10 +1,17 @@
 import { get } from 'env-var';
 
+const ENVIRONMENT = get('ENVIRONMENT').default('development').asString();
+const HOST_SERVER = get('HOST_SERVER').default('localhost').asString();
+
+const SERVER = ['production', 'prod'].includes(ENVIRONMENT)
+	? get('SERVER').default('https://apieverywhere.com').asString()
+	: `http://${HOST_SERVER}`;
+
 export const CONFIG_GLOBALS = {
 	PORT: get('PORT_SERVER').default(3000).asPortNumber(),
-	HOST: get('HOST_SERVER').default('localhost').asString(),
-	SERVER: get('SERVER').default('https://apieverywhere.com').asString(),
-	ENVIRONMENT: get('ENVIRONMENT').default('development').asString(),
+	HOST: HOST_SERVER,
+	SERVER: SERVER,
+	ENVIRONMENT: ENVIRONMENT,
 	API_SERVER_PREFIX: get('API_SERVER_PREFIX').default('/api').asString(),
 	API_SERVER_VERSION: get('API_SERVER_VERSION').default('v1').asString(),
 	ROUTE: {
@@ -21,13 +28,17 @@ export const CONFIG_GLOBALS = {
 			DIALECT: get('DIALECT_MYSQL').default('mysql').asString(),
 			HOST: get('HOST_MYSQL').default('localhost').asString(),
 			IDLE: get('IDLE_MYSQL').default(10000).asInt(),
-			PASSWORD: get('PASSWORD_MYSQL').default('2Noviembre2025').asString(),
+			PASSWORD: get('PASSWORD_MYSQL')
+				.default('2Noviembre2025')
+				.asString(),
 			POOL_MAX: get('POOL_MAX_MYSQL').default(5).asInt(),
 			POOL_MIN: get('POOL_MIN_MYSQL').default(0).asInt(),
 			PORT: get('PORT_MYSQL').default(3306).asPortNumber(),
 			TIMESTAMPS: get('TIMESTAMPS_MYSQL').default(1).asBool(),
-      USERNAME: get('USERNAME_MYSQL').default('root').asString(),
-      URL: get('DATABASE_URL_MYSQL').default('mysql://root:24Enero2011.@localhost:3306/beils_db').asString(),
+			USERNAME: get('USERNAME_MYSQL').default('root').asString(),
+			URL: get('DATABASE_URL')
+				.default('mysql://root:24Enero2011.@localhost:3306/beils_db')
+				.asString(),
 		},
 		TABLES: {
 			AUTH: get('AUTH_TABLE').default('AUTH').asString(),
