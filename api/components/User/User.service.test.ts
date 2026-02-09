@@ -1,14 +1,15 @@
 import { UserService } from './User.service';
 import { UserRepository } from './User.repository';
 import { AppError } from '../../middlewares/errorHandler';
-import { User } from '@config/prisma/generated/client';
+import { User, Role } from '../../config/prisma/generated/client';
 
 // Helper for type-safe mocks without partials
 const mockUser = (data: Partial<User>): User => ({
 	user_id: 'default-id',
 	email: 'default@test.com',
 	password: 'hashed_password',
-	role: 'ADMIN',
+	role: Role.ADMIN,
+	is_active: true,
 	created_at: new Date(),
 	updated_at: new Date(),
 	...data,
@@ -31,13 +32,27 @@ jest.mock('./User.repository', () => {
 });
 
 // Mock de dependencias externas
-jest.mock('@/adapters', () => ({
+// Mock de dependencias externas
+jest.mock('../../adapters', () => ({
 	adapters: {
 		encrypt: jest.fn(pass => Promise.resolve(`hashed_${pass}`)),
 		encryptCompare: jest.fn((pass, hash) =>
 			Promise.resolve(hash === `hashed_${pass}`),
 		),
 		generateToken: jest.fn(() => 'mock_token'),
+	},
+}));
+
+jest.mock('../../utils/logger', () => ({
+	buildLogger: jest.fn(() => ({
+		error: jest.fn(),
+		info: jest.fn(),
+	})),
+}));
+
+jest.mock('../../config', () => ({
+	CONFIG_GLOBALS: {
+		JWT: { SECRET: 'secret' },
 	},
 }));
 
@@ -71,7 +86,7 @@ describe('UserService', () => {
 				mockUser({
 					user_id: '1',
 					email: input.email,
-					role: input.role,
+					role: Role.ADMIN,
 					password: 'hashed_password123',
 				}),
 			);
@@ -90,7 +105,7 @@ describe('UserService', () => {
 				role: 'ADMIN',
 			};
 			mockRepo.findByEmail.mockResolvedValue(
-				mockUser({ user_id: '1', ...input }),
+				mockUser({ user_id: '1', ...input, role: Role.ADMIN }),
 			);
 
 			// Esperamos que lance error
@@ -108,7 +123,7 @@ describe('UserService', () => {
 				user_id: '1',
 				email: 'test@test.com',
 				password: 'hashed_password123',
-				role: 'ADMIN',
+				role: Role.ADMIN,
 			});
 
 			mockRepo.findByEmail.mockResolvedValue(storedUser);
