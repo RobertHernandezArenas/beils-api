@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import {
-	CreateUserSchema,
+	UserSchema,
 	validatorUserDataBody,
 } from '@/components/User/User.schema';
 
@@ -12,7 +12,7 @@ export class UserMiddleware {
 	) {
 		try {
 			// Validamos los datos del body usando el esquema definido
-			await CreateUserSchema.parseAsync(request.body);
+			await UserSchema.create.parseAsync(request.body);
 
 			// Si la validación es exitosa, continuamos al siguiente middleware o controlador
 			return next();

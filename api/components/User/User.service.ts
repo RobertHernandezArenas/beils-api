@@ -1,10 +1,14 @@
 import { UserRepository } from './User.repository';
-import { Prisma, User } from '@config/prisma/generated/client';
+// import { Prisma, User, Role } from '@config/prisma/generated/client';
+import { Prisma, User, Role } from '../../config/prisma/generated/client';
 import { AppError } from '../../middlewares/errorHandler';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './User.dto';
-import { adapters } from '@/adapters';
-import { CONFIG_GLOBALS } from '@/config';
-import { buildLogger } from '@/utils/logger';
+// import { adapters } from '@/adapters';
+import { adapters } from '../../adapters';
+// import { CONFIG_GLOBALS } from '@/config';
+import { CONFIG_GLOBALS } from '../../config';
+// import { buildLogger } from '@/utils/logger';
+import { buildLogger } from '../../utils/logger';
 
 const logger = buildLogger('user.service.ts');
 
@@ -27,7 +31,6 @@ export class UserService {
 		const newUser: Prisma.UserCreateInput = {
 			email: data.email,
 			password: hashedPassword,
-			role: data.role || 'ADMIN',
 		};
 
 		return this.userRepository.create(newUser);
@@ -49,8 +52,6 @@ export class UserService {
 		const currentUser = await this.findById(user_id);
 
 		const updateData: Prisma.UserUpdateInput = {};
-		if (data.email) updateData.email = data.email;
-		if (data.role) updateData.role = data.role;
 		if (data.password) {
 			updateData.password = await adapters.encrypt(data.password, 10);
 		}

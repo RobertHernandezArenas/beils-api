@@ -25,13 +25,21 @@ enum DocumentType {
   CIF
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   user_id                String              @id @default(uuid()) @db.Char(100)
   email                  String              @unique @db.VarChar(50)
   password               String              @db.VarChar(255)
-  role                   String              @default("ADMIN") @db.VarChar(25)
+  role                   Role                @default(USER)
+  is_active              Boolean             @default(true)
   created_at             DateTime            @default(now())
   updated_at             DateTime            @updatedAt
+
+  @@map("users")
 }
 
 model Client {

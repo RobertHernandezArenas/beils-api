@@ -2,11 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { buildLogger } from '@/utils/logger';
 import { userService } from './User.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './User.dto';
-import {
-	CreateUserSchema,
-	LoginUserSchema,
-	UpdateUserSchema,
-} from './User.schema';
+import { UserSchema } from './User.schema';
 
 const logger = buildLogger('user.controller.ts');
 
@@ -15,7 +11,7 @@ class UserController {
 		try {
 			const data = request.body;
 			const validatedData: CreateUserDto =
-				await CreateUserSchema.parseAsync(data);
+				await UserSchema.create.parseAsync(data);
 
 			const user = await userService.create(validatedData);
 
@@ -24,7 +20,6 @@ class UserController {
 				data: user,
 			});
 		} catch (error) {
-			// logger.error((error as Error).message);
 			next(error);
 		}
 	}
@@ -62,7 +57,7 @@ class UserController {
 			const { id } = request.params;
 			const data = request.body;
 			const validatedData: UpdateUserDto =
-				await UpdateUserSchema.parseAsync(data);
+				await UserSchema.update.parseAsync(data);
 
 			const user = await userService.update(id, validatedData);
 
@@ -90,7 +85,7 @@ class UserController {
 		try {
 			const data = request.body;
 			const validatedData: LoginUserDto =
-				await LoginUserSchema.parseAsync(data);
+				await UserSchema.login.parseAsync(data);
 
 			const result = await userService.login(validatedData);
 

@@ -1,10 +1,6 @@
-import { z } from 'zod';
-import {
-	CreateUserSchema,
-	LoginUserSchema,
-	UpdateUserSchema,
-} from './User.schema';
+import { Infer } from '@/adapters/zod'; // Import Infer type from our adapter
+import { UserSchema } from './User.schema';
 
-export type CreateUserDto = z.infer<typeof CreateUserSchema>;
-export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
-export type LoginUserDto = z.infer<typeof LoginUserSchema>;
+export type CreateUserDto = Infer<typeof UserSchema.create>;
+export type UpdateUserDto = Infer<typeof UserSchema.update>;
+export type LoginUserDto = Infer<typeof UserSchema.login>;

@@ -12,6 +12,7 @@
 		"paths": {
 			"@/*": ["./api/*"],
 			"@components/*": ["./api/components/*"],
+      "@user": ["./api/components/User/*"],
 			"@config/*": ["./api/config/*"],
 			"@orm/*": ["./api/config/database/orm/*"],
 			"@router/*": ["./api/router/*"],
