@@ -1,13 +1,9 @@
 import { UserRepository } from './User.repository';
-// import { Prisma, User, Role } from '@config/prisma/generated/client';
-import { Prisma, User, Role } from '../../config/prisma/generated/client';
+import { Prisma, User } from '../../config/prisma/generated/client';
 import { AppError } from '../../middlewares/errorHandler';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './User.dto';
-// import { adapters } from '@/adapters';
+import { UserDTO } from './User.dto';
 import { adapters } from '../../adapters';
-// import { CONFIG_GLOBALS } from '@/config';
 import { CONFIG_GLOBALS } from '../../config';
-// import { buildLogger } from '@/utils/logger';
 import { buildLogger } from '../../utils/logger';
 
 const logger = buildLogger('user.service.ts');
@@ -19,7 +15,7 @@ export class UserService {
 		this.userRepository = new UserRepository();
 	}
 
-	async create(data: CreateUserDto): Promise<User> {
+	async create(data: UserDTO['create']): Promise<User> {
 		const existingUser = await this.userRepository.findByEmail(data.email);
 		if (existingUser) {
 			logger.error(`El usuario con email ${data.email} ya existe`);
@@ -48,7 +44,7 @@ export class UserService {
 		return user;
 	}
 
-	async update(user_id: string, data: UpdateUserDto): Promise<User> {
+	async update(user_id: string, data: UserDTO['update']): Promise<User> {
 		const currentUser = await this.findById(user_id);
 
 		const updateData: Prisma.UserUpdateInput = {};
@@ -65,7 +61,7 @@ export class UserService {
 	}
 
 	async login(
-		data: LoginUserDto,
+		data: UserDTO['login'],
 	): Promise<{ user: Partial<User>; token: string }> {
 		const user = await this.userRepository.findByEmail(data.email);
 

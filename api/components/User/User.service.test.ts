@@ -1,19 +1,39 @@
 import { UserService } from './User.service';
 import { UserRepository } from './User.repository';
 import { AppError } from '../../middlewares/errorHandler';
-import { User, Role } from '../../config/prisma/generated/client';
 
-// Helper for type-safe mocks without partials
-const mockUser = (data: Partial<User>): User => ({
-	user_id: 'default-id',
-	email: 'default@test.com',
-	password: 'hashed_password',
-	role: Role.ADMIN,
-	is_active: true,
-	created_at: new Date(),
-	updated_at: new Date(),
-	...data,
-});
+// Mock the Prisma Client generated module to prevent valid ESM import issues in Jest
+jest.mock('../../config/prisma/generated/client', () => ({
+	Prisma: {},
+	Role: {
+		ADMIN: 'ADMIN',
+		USER: 'USER',
+	},
+	// Mock other exports if needed
+}));
+
+// Using a local interface for User to simplify tests and avoid import issues with generated client.
+interface User {
+	user_id: string;
+	email: string;
+	password: string;
+	role: any;
+	is_active: boolean;
+	created_at: Date;
+	updated_at: Date;
+}
+
+const mockUser = (data: Partial<User>): any =>
+	({
+		user_id: 'default-id',
+		email: 'default@test.com',
+		password: 'hashed_password',
+		role: 'ADMIN',
+		is_active: true,
+		created_at: new Date(),
+		updated_at: new Date(),
+		...data,
+	}) as User;
 
 // Mock del Repository (Clase completa) con factory para evitar cargar el archivo real
 jest.mock('./User.repository', () => {
@@ -31,7 +51,6 @@ jest.mock('./User.repository', () => {
 	};
 });
 
-// Mock de dependencias externas
 // Mock de dependencias externas
 jest.mock('../../adapters', () => ({
 	adapters: {
@@ -67,7 +86,6 @@ describe('UserService', () => {
 		service = new UserService();
 
 		// Obtener la instancia del mock directamente del servicio
-		// Hacemos cast a unknown primero para "romper" el tipado privado y luego al tipo correcto Jest Mock
 		mockRepo = (service as unknown as { userRepository: UserRepository })
 			.userRepository as jest.Mocked<UserRepository>;
 	});
@@ -77,7 +95,6 @@ describe('UserService', () => {
 			const input = {
 				email: 'test@test.com',
 				password: 'password123',
-				role: 'ADMIN',
 			};
 
 			// Configuramos el comportamiento del mock
@@ -86,7 +103,7 @@ describe('UserService', () => {
 				mockUser({
 					user_id: '1',
 					email: input.email,
-					role: Role.ADMIN,
+					role: 'USER', // Default role
 					password: 'hashed_password123',
 				}),
 			);
@@ -94,7 +111,12 @@ describe('UserService', () => {
 			const result = await service.create(input);
 
 			expect(mockRepo.findByEmail).toHaveBeenCalledWith(input.email);
-			expect(mockRepo.create).toHaveBeenCalled();
+			expect(mockRepo.create).toHaveBeenCalledWith(
+				expect.objectContaining({
+					email: input.email,
+					password: 'hashed_password123',
+				}),
+			);
 			expect(result.password).toBe('hashed_password123');
 		});
 
@@ -102,10 +124,9 @@ describe('UserService', () => {
 			const input = {
 				email: 'exist@test.com',
 				password: 'password123',
-				role: 'ADMIN',
 			};
 			mockRepo.findByEmail.mockResolvedValue(
-				mockUser({ user_id: '1', ...input, role: Role.ADMIN }),
+				mockUser({ user_id: '1', ...input, role: 'ADMIN' }),
 			);
 
 			// Esperamos que lance error
@@ -123,7 +144,7 @@ describe('UserService', () => {
 				user_id: '1',
 				email: 'test@test.com',
 				password: 'hashed_password123',
-				role: Role.ADMIN,
+				role: 'ADMIN',
 			});
 
 			mockRepo.findByEmail.mockResolvedValue(storedUser);
@@ -178,7 +199,12 @@ describe('UserService', () => {
 
 			await service.update(userId, updateDto);
 
-			expect(mockRepo.update).toHaveBeenCalled();
+			expect(mockRepo.update).toHaveBeenCalledWith(
+				userId,
+				expect.objectContaining({
+					password: 'hashed_newPassword',
+				}),
+			);
 		});
 	});
 

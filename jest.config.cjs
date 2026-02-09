@@ -2,6 +2,7 @@
 module.exports = {
 	preset: 'ts-jest',
 	testEnvironment: 'node',
+	roots: ['<rootDir>/api'],
 	moduleNameMapper: {
 		'^@/(.*)$': '<rootDir>/api/$1',
 		'^@components/(.*)$': '<rootDir>/api/components/$1',
