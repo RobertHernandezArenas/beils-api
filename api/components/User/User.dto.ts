@@ -5,8 +5,17 @@ export type CreateUserDto = Infer<typeof UserSchema.create>;
 export type UpdateUserDto = Infer<typeof UserSchema.update>;
 export type LoginUserDto = Infer<typeof UserSchema.login>;
 
+export type PublicUserDto = {
+	user_id: string;
+	email: string;
+	role?: string;
+	created_at: Date;
+	updated_at: Date;
+};
+
 export type UserDTO = {
 	create: CreateUserDto;
 	update: UpdateUserDto;
 	login: LoginUserDto;
+	public: PublicUserDto;
 };

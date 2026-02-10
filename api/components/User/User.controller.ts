@@ -26,7 +26,7 @@ class UserController {
 
 	async findAll(request: Request, response: Response, next: NextFunction) {
 		try {
-			const users = await userService.findAll()
+			const users = await userService.findAll();
 
 			response.status(200).json({
 				data: { users },
@@ -55,12 +55,12 @@ class UserController {
 
 	async update(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { id } = request.params;
+			const { user_id } = request.params;
 			const data = request.body;
 			const validatedData: UserDTO['update'] =
 				await UserSchema.update.parseAsync(data);
 
-			const user = await userService.update(id, validatedData);
+			const user = await userService.update(user_id, validatedData);
 
 			response.status(200).json({
 				data: user,

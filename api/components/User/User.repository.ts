@@ -1,6 +1,8 @@
 import { Prisma, User } from '@config/prisma/generated/client';
 import { prismaClient } from '@/config/prisma';
 
+// Aqui hago el select de los campos que voy a usar DB
+
 export class UserRepository {
 	async create(data: Prisma.UserCreateInput): Promise<User> {
 		return prismaClient.user.create({ data });

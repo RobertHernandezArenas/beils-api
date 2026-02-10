@@ -35,10 +35,6 @@ export const UserRouter: Router = Router()
 	 *                 format: password
 	 *                 minLength: 6
 	 *                 description: Contraseña del usuario
-	 *               role:
-	 *                 type: string
-	 *                 default: ADMIN
-	 *                 description: Rol del usuario en el sistema
 	 *     responses:
 	 *       201:
 	 *         description: Usuario creado exitosamente
