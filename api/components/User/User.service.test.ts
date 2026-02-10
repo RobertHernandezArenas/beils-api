@@ -1,6 +1,7 @@
 import { UserService } from './User.service';
 import { UserRepository } from './User.repository';
 import { AppError } from '../../middlewares/errorHandler';
+import { adapters } from '../../adapters';
 
 // Mock the Prisma Client generated module to prevent valid ESM import issues in Jest
 jest.mock('../../config/prisma/generated/client', () => ({
@@ -66,6 +67,8 @@ jest.mock('../../utils/logger', () => ({
 	buildLogger: jest.fn(() => ({
 		error: jest.fn(),
 		info: jest.fn(),
+		log: jest.fn(),
+		warn: jest.fn(),
 	})),
 }));
 
@@ -153,6 +156,52 @@ describe('UserService', () => {
 
 			expect(result.token).toBe('mock_token');
 			expect(result.user.email).toBe(loginDto.email);
+		});
+
+		it('debería permitir login con contraseña en texto plano y actualizarla', async () => {
+			const loginDto = {
+				email: 'plain@test.com',
+				password: 'plainPassword',
+			};
+			const storedUser = mockUser({
+				user_id: 'p1',
+				email: 'plain@test.com',
+				password: 'plainPassword', // Stored as plain text
+			});
+
+			mockRepo.findByEmail.mockResolvedValue(storedUser);
+			// First compare fails (bcrypt vs plain), second check (plain vs plain) passes
+			(adapters.encryptCompare as jest.Mock).mockResolvedValueOnce(false);
+
+			const result = await service.login(loginDto);
+
+			expect(mockRepo.update).toHaveBeenCalledWith(
+				'p1',
+				expect.objectContaining({
+					password: 'hashed_plainPassword',
+				}),
+			);
+			expect(result.token).toBe('mock_token');
+		});
+
+		it('debería normalizar el email a minúsculas en login', async () => {
+			const loginDto = {
+				email: 'TEST@Test.com',
+				password: 'password123',
+			};
+			const storedUser = mockUser({
+				user_id: '1',
+				email: 'test@test.com',
+				password: 'hashed_password123',
+				role: 'ADMIN',
+			});
+
+			mockRepo.findByEmail.mockResolvedValue(storedUser);
+
+			const result = await service.login(loginDto);
+
+			expect(mockRepo.findByEmail).toHaveBeenCalledWith('test@test.com');
+			expect(result.user.email).toBe('test@test.com');
 		});
 
 		it('debería lanzar error si el usuario no existe', async () => {

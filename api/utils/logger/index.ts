@@ -40,6 +40,10 @@ export function buildLogger(file: string) {
 			const lineNumber = line ?? getCallerLine();
 			logger.info(message, { file, line: lineNumber });
 		},
+		warn: (message: string, line?: number | string) => {
+			const lineNumber = line ?? getCallerLine();
+			logger.warn(message, { file, line: lineNumber });
+		},
 		error: (message: string, line?: number | string) => {
 			const lineNumber = line ?? getCallerLine();
 			logger.error(message, { file, line: lineNumber });

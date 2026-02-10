@@ -16,16 +16,18 @@ export class UserService {
 	}
 
 	async create(data: UserDTO['create']): Promise<User> {
-		const existingUser = await this.userRepository.findByEmail(data.email);
+		const email = data.email.toLowerCase();
+		const existingUser = await this.userRepository.findByEmail(email);
+
 		if (existingUser) {
-			logger.error(`El usuario con email ${data.email} ya existe`);
+			logger.error(`El usuario con email ${email} ya existe`);
 			throw new AppError('CONFLICT', 409);
 		}
 
 		const hashedPassword = await adapters.encrypt(data.password, 10);
 
 		const newUser: Prisma.UserCreateInput = {
-			email: data.email,
+			email,
 			password: hashedPassword,
 		};
 
@@ -63,19 +65,30 @@ export class UserService {
 	async login(
 		data: UserDTO['login'],
 	): Promise<{ user: Partial<User>; token: string }> {
-		const user = await this.userRepository.findByEmail(data.email);
+		const email = data.email.toLowerCase();
+		const user = await this.userRepository.findByEmail(email);
 
 		if (!user) {
-			throw new AppError('Credenciales inválidas', 401);
+			logger.error(`Usuario no encontrado: ${email}`);
+			throw new AppError('Usuario no encontrado', 404);
 		}
 
-		const isValidPassword = await adapters.encryptCompare(
+		let isValidPassword = await adapters.encryptCompare(
 			data.password,
 			user.password,
 		);
 
+		if (!isValidPassword && data.password === user.password) {
+			const newHash = await adapters.encrypt(data.password, 10);
+			await this.userRepository.update(user.user_id, {
+				password: newHash,
+			});
+			isValidPassword = true;
+		}
+
 		if (!isValidPassword) {
-			throw new AppError('Credenciales inválidas', 401);
+			logger.error(`Contraseña inválida para usuario: ${email}`);
+			throw new AppError('Contraseña incorrecta', 401);
 		}
 
 		const token = adapters.generateToken(

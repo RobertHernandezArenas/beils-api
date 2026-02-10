@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { buildLogger } from '@/utils/logger';
 import { userService } from './User.service';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './User.dto';
+import { UserDTO } from './User.dto';
 import { UserSchema } from './User.schema';
 
 const logger = buildLogger('user.controller.ts');
@@ -10,7 +10,7 @@ class UserController {
 	async create(request: Request, response: Response, next: NextFunction) {
 		try {
 			const data = request.body;
-			const validatedData: CreateUserDto =
+			const validatedData: UserDTO['create'] =
 				await UserSchema.create.parseAsync(data);
 
 			const user = await userService.create(validatedData);
@@ -26,7 +26,8 @@ class UserController {
 
 	async findAll(request: Request, response: Response, next: NextFunction) {
 		try {
-			const users = await userService.findAll();
+			const users = await userService.findAll()
+
 			response.status(200).json({
 				data: { users },
 				meta: {
@@ -56,7 +57,7 @@ class UserController {
 		try {
 			const { id } = request.params;
 			const data = request.body;
-			const validatedData: UpdateUserDto =
+			const validatedData: UserDTO['update'] =
 				await UserSchema.update.parseAsync(data);
 
 			const user = await userService.update(id, validatedData);
@@ -84,7 +85,7 @@ class UserController {
 	async login(request: Request, response: Response, next: NextFunction) {
 		try {
 			const data = request.body;
-			const validatedData: LoginUserDto =
+			const validatedData: UserDTO['login'] =
 				await UserSchema.login.parseAsync(data);
 
 			const result = await userService.login(validatedData);
