@@ -191,7 +191,7 @@ export const UserRouter: Router = Router()
 
 	/**
 	 * @swagger
-	 * /user/{id}/status:
+	 * /user/{user_id}/status:
 	 *   patch:
 	 *     summary: Activar o desactivar usuario
 	 *     tags: [User]
@@ -199,7 +199,7 @@ export const UserRouter: Router = Router()
 	 *       - bearerAuth: []
 	 *     parameters:
 	 *       - in: path
-	 *         name: id
+	 *         name: user_id
 	 *         schema:
 	 *           type: string
 	 *         required: true
@@ -237,7 +237,7 @@ export const UserRouter: Router = Router()
 	 *         description: Datos inválidos
 	 */
 	.patch(
-		'/:id/status',
+		'/:user_id/status',
 		isAuthenticated,
 		checkRole(['ADMIN']),
 		userController.updateStatus,
