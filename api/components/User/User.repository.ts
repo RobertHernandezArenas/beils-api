@@ -1,4 +1,4 @@
-import { Prisma, User } from '@config/prisma/generated/client';
+import { Prisma, User, UserStatus } from '@config/prisma/generated/client';
 import { prismaClient } from '@/config/prisma';
 
 // Aqui hago el select de los campos que voy a usar DB
@@ -31,6 +31,16 @@ export class UserRepository {
 		return prismaClient.user.update({
 			where: { user_id },
 			data: { account_status },
+		});
+	}
+
+	async updateRefreshToken(
+		user_id: string,
+		refresh_token: string | null,
+	): Promise<User> {
+		return prismaClient.user.update({
+			where: { user_id },
+			data: { refresh_token },
 		});
 	}
 

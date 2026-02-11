@@ -41,6 +41,7 @@ model User {
   password               String              @db.VarChar(255)
   role                   Role                @default(USER)
   account_status         UserStatus          @default(ACTIVATED)
+  refresh_token          String?             @db.Text
   created_at             DateTime            @default(now())
   updated_at             DateTime            @updatedAt
 

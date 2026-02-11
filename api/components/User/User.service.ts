@@ -72,7 +72,7 @@ export class UserService {
 
 	async login(
 		data: UserDTO['login'],
-	): Promise<{ user: Partial<User>; token: string }> {
+	): Promise<{ user: Partial<User>; token: string; refreshToken: string }> {
 		const email = data.email.toLowerCase();
 		const user = await this.userRepository.findByEmail(email);
 
@@ -106,6 +106,18 @@ export class UserService {
 				role: user.role,
 			},
 			CONFIG_GLOBALS.JWT.SECRET,
+			CONFIG_GLOBALS.JWT.DURATION,
+		);
+
+		const refreshToken = adapters.generateToken(
+			{ id: user.user_id },
+			CONFIG_GLOBALS.JWT.SECRET,
+			'7d',
+		);
+
+		await this.userRepository.updateRefreshToken(
+			user.user_id,
+			refreshToken,
 		);
 
 		return {
@@ -115,7 +127,54 @@ export class UserService {
 				role: user.role,
 			},
 			token,
+			refreshToken,
 		};
+	}
+
+	async refreshToken(
+		data: UserDTO['refreshToken'],
+	): Promise<{ token: string; refreshToken: string }> {
+		const { refresh_token } = data;
+
+		try {
+			const decoded = adapters.verifyToken(
+				refresh_token,
+				CONFIG_GLOBALS.JWT.SECRET,
+			);
+			const user = await this.userRepository.findById(decoded.id);
+
+			if (!user || user.refresh_token !== refresh_token) {
+				throw new AppError('Refresh token inválido', 401);
+			}
+
+			const newToken = adapters.generateToken(
+				{
+					id: user.user_id,
+					email: user.email,
+					role: user.role,
+				},
+				CONFIG_GLOBALS.JWT.SECRET,
+				CONFIG_GLOBALS.JWT.DURATION,
+			);
+
+			const newRefreshToken = adapters.generateToken(
+				{ id: user.user_id },
+				CONFIG_GLOBALS.JWT.SECRET,
+				'7d',
+			);
+
+			await this.userRepository.updateRefreshToken(
+				user.user_id,
+				newRefreshToken,
+			);
+
+			return {
+				token: newToken,
+				refreshToken: newRefreshToken,
+			};
+		} catch (error) {
+			throw new AppError('Refresh token inválido o expirado', 401);
+		}
 	}
 }
 

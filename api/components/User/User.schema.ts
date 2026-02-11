@@ -35,6 +35,12 @@ export const UserSchema = {
 	updateStatus: validatorUserDataBody.object({
 		account_status: validatorUserDataBody.nativeEnum(UserStatus),
 	}),
+
+	refreshToken: validatorUserDataBody.object({
+		refresh_token: validatorUserDataBody
+			.string('El refresh token es obligatorio')
+			.nonempty('El refresh token no debe estar vacío'),
+	}),
 };
 
 export const UserSwaggerSchemas = {

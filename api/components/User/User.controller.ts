@@ -121,6 +121,27 @@ class UserController {
 			next(error);
 		}
 	}
+
+	async refreshToken(
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) {
+		try {
+			const data = request.body;
+			const validatedData: UserDTO['refreshToken'] =
+				await UserSchema.refreshToken.parseAsync(data);
+
+			const result = await userService.refreshToken(validatedData);
+
+			response.status(200).json({
+				error: false,
+				data: result,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
 }
 
 export const userController = new UserController();

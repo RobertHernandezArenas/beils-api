@@ -121,6 +121,49 @@ export const UserRouter: Router = Router()
 
 	/**
 	 * @swagger
+	 * /user/refresh-token:
+	 *   post:
+	 *     summary: Renovar el token de acceso
+	 *     tags: [User]
+	 *     requestBody:
+	 *       required: true
+	 *       content:
+	 *         application/json:
+	 *           schema:
+	 *             type: object
+	 *             required:
+	 *               - refresh_token
+	 *             properties:
+	 *               refresh_token:
+	 *                 type: string
+	 *                 description: Token de refresco
+	 *     responses:
+	 *       200:
+	 *         description: Token renovado exitosamente
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 error:
+	 *                   type: boolean
+	 *                   example: false
+	 *                 data:
+	 *                   type: object
+	 *                   properties:
+	 *                     token:
+	 *                       type: string
+	 *                       description: Nuevo Token JWT
+	 *                     refreshToken:
+	 *                       type: string
+	 *                       description: Nuevo Refresh Token
+	 *       401:
+	 *         description: Refresh token inválido o expirado
+	 */
+	.post('/refresh-token', userController.refreshToken)
+
+	/**
+	 * @swagger
 	 * /user:
 	 *   get:
 	 *     summary: Obtener todos los usuarios

@@ -20,6 +20,7 @@ interface User {
 	password: string;
 	role: any;
 	account_status: any;
+	refresh_token: string | null;
 	created_at: Date;
 	updated_at: Date;
 }
@@ -31,6 +32,7 @@ const mockUser = (data: Partial<User>): any =>
 		password: 'hashed_password',
 		role: 'ADMIN',
 		account_status: 'ACTIVATED',
+		refresh_token: null,
 		created_at: new Date(),
 		updated_at: new Date(),
 		...data,
@@ -47,6 +49,7 @@ jest.mock('./User.repository', () => {
 				findAll: jest.fn(),
 				update: jest.fn(),
 				updateStatus: jest.fn(),
+				updateRefreshToken: jest.fn(),
 				delete: jest.fn(),
 			};
 		}),
@@ -61,6 +64,7 @@ jest.mock('../../adapters', () => ({
 			Promise.resolve(hash === `hashed_${pass}`),
 		),
 		generateToken: jest.fn(() => 'mock_token'),
+		verifyToken: jest.fn(),
 	},
 }));
 
@@ -156,6 +160,7 @@ describe('UserService', () => {
 			const result = await service.login(loginDto);
 
 			expect(result.token).toBe('mock_token');
+			expect(result.refreshToken).toBe('mock_token');
 			expect(result.user.email).toBe(loginDto.email);
 		});
 
@@ -183,6 +188,7 @@ describe('UserService', () => {
 				}),
 			);
 			expect(result.token).toBe('mock_token');
+			expect(result.refreshToken).toBe('mock_token');
 		});
 
 		it('debería normalizar el email a minúsculas en login', async () => {
@@ -307,6 +313,59 @@ describe('UserService', () => {
 					account_status: 'ACTIVATED',
 				}),
 			).rejects.toThrow();
+		});
+	});
+
+	describe('refreshToken', () => {
+		it('debería retornar nuevo token y refresh token si el token es válido', async () => {
+			const refreshToken = 'valid_refresh_token';
+			const user = mockUser({
+				user_id: '1',
+				refresh_token: refreshToken,
+			});
+
+			// Mock adapters.verifyToken to return decoded object
+			(adapters.verifyToken as jest.Mock).mockReturnValue({ id: '1' });
+			mockRepo.findById.mockResolvedValue(user);
+
+			const result = await service.refreshToken({
+				refresh_token: refreshToken,
+			});
+
+			expect(adapters.verifyToken).toHaveBeenCalledWith(
+				refreshToken,
+				'secret',
+			);
+			expect(mockRepo.findById).toHaveBeenCalledWith('1');
+			expect(mockRepo.updateRefreshToken).toHaveBeenCalled();
+			expect(result.token).toBe('mock_token');
+			expect(result.refreshToken).toBe('mock_token');
+		});
+
+		it('debería lanzar error si el refresh token es inválido', async () => {
+			const refreshToken = 'invalid_token';
+			(adapters.verifyToken as jest.Mock).mockImplementation(() => {
+				throw new Error('Invalid token');
+			});
+
+			await expect(
+				service.refreshToken({ refresh_token: refreshToken }),
+			).rejects.toThrow(AppError);
+		});
+
+		it('debería lanzar error si el usuario no tiene ese refresh token', async () => {
+			const refreshToken = 'valid_token_but_deleted';
+			const user = mockUser({
+				user_id: '1',
+				refresh_token: 'different_token',
+			});
+
+			(adapters.verifyToken as jest.Mock).mockReturnValue({ id: '1' });
+			mockRepo.findById.mockResolvedValue(user);
+
+			await expect(
+				service.refreshToken({ refresh_token: refreshToken }),
+			).rejects.toThrow(AppError);
 		});
 	});
 });

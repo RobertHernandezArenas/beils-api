@@ -4,6 +4,7 @@ import { UserSchema } from './User.schema';
 export type CreateUserDto = Infer<typeof UserSchema.create>;
 export type UpdateUserDto = Infer<typeof UserSchema.update>;
 export type UpdateUserStatusDto = Infer<typeof UserSchema.updateStatus>;
+export type RefreshTokenDto = Infer<typeof UserSchema.refreshToken>;
 export type LoginUserDto = Infer<typeof UserSchema.login>;
 
 export type PublicUserDto = {
@@ -20,4 +21,5 @@ export type UserDTO = {
 	login: LoginUserDto;
 	public: PublicUserDto;
 	updateStatus: UpdateUserStatusDto;
+	refreshToken: RefreshTokenDto;
 };

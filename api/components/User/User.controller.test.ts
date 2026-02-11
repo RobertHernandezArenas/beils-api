@@ -35,6 +35,7 @@ jest.mock('./User.service', () => ({
 		updateStatus: jest.fn(),
 		delete: jest.fn(),
 		login: jest.fn(),
+		refreshToken: jest.fn(),
 	},
 }));
 
@@ -96,6 +97,7 @@ describe('UserController', () => {
 			const mockResult = {
 				user: { user_id: '1', email: 'login@test.com' },
 				token: 'abc',
+				refreshToken: 'xyz',
 			};
 
 			(userService.login as jest.Mock).mockResolvedValue(mockResult);
@@ -158,6 +160,47 @@ describe('UserController', () => {
 
 			expect(res.status).toHaveBeenCalledWith(204);
 			expect(res.send).toHaveBeenCalled();
+		});
+	});
+
+	describe('refreshToken', () => {
+		it('debería retornar 200 y nuevos tokens', async () => {
+			req.body = { refresh_token: 'valid_refresh_token' };
+			const mockResult = {
+				token: 'new_token',
+				refreshToken: 'new_refresh_token',
+			};
+
+			(userService.refreshToken as jest.Mock).mockResolvedValue(
+				mockResult,
+			);
+
+			await userController.refreshToken(
+				req as Request,
+				res as Response,
+				next,
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({
+				error: false,
+				data: mockResult,
+			});
+		});
+
+		it('debería pasar error a next si falla', async () => {
+			const error = new Error('Invalid token');
+			(userService.refreshToken as jest.Mock).mockRejectedValue(error);
+
+			req.body = { refresh_token: 'invalid' };
+
+			await userController.refreshToken(
+				req as Request,
+				res as Response,
+				next,
+			);
+
+			expect(next).toHaveBeenCalledWith(error);
 		});
 	});
 });
