@@ -71,10 +71,33 @@ class UserController {
 		}
 	}
 
+	async updateStatus(
+		request: Request,
+		response: Response,
+		next: NextFunction,
+	) {
+		try {
+			const { user_id } = request.params;
+			const data = request.body;
+			const validatedData: UserDTO['updateStatus'] =
+				await UserSchema.updateStatus.parseAsync(data);
+
+			const user = await userService.updateStatus(user_id, validatedData);
+
+			response.status(200).json({
+				data: user,
+				message: 'Estado de usuario actualizado correctamente',
+			});
+		} catch (error) {
+			logger.error((error as Error).message);
+			next(error);
+		}
+	}
+
 	async delete(request: Request, response: Response, next: NextFunction) {
 		try {
-			const { id } = request.params;
-			await userService.delete(id);
+			const { user_id } = request.params;
+			await userService.delete(user_id);
 			response.status(204).send();
 		} catch (error) {
 			logger.error((error as Error).message);

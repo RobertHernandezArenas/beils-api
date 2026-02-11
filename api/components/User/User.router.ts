@@ -191,6 +191,60 @@ export const UserRouter: Router = Router()
 
 	/**
 	 * @swagger
+	 * /user/{id}/status:
+	 *   patch:
+	 *     summary: Activar o desactivar usuario
+	 *     tags: [User]
+	 *     security:
+	 *       - bearerAuth: []
+	 *     parameters:
+	 *       - in: path
+	 *         name: id
+	 *         schema:
+	 *           type: string
+	 *         required: true
+	 *         description: ID del usuario
+	 *     requestBody:
+	 *       required: true
+	 *       content:
+	 *         application/json:
+	 *           schema:
+	 *             type: object
+	 *             required:
+	 *               - account_status
+	 *             properties:
+	 *               account_status:
+	 *                 type: string
+	 *                 enum: [ACTIVATED, DEACTIVATED]
+	 *                 description: Nuevo estado del usuario
+	 *                 example: ACTIVATED
+	 *     responses:
+	 *       200:
+	 *         description: Estado actualizado correctamente
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 data:
+	 *                   type: object
+	 *                   description: Usuario actualizado
+	 *                 message:
+	 *                   type: string
+	 *       404:
+	 *         description: Usuario no encontrado
+	 *       400:
+	 *         description: Datos inválidos
+	 */
+	.patch(
+		'/:id/status',
+		isAuthenticated,
+		checkRole(['ADMIN']),
+		userController.updateStatus,
+	)
+
+	/**
+	 * @swagger
 	 * /user/{id}:
 	 *   put:
 	 *     summary: Actualizar usuario

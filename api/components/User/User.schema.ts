@@ -1,4 +1,5 @@
 import { validateInput } from '@/adapters/zod';
+import { UserStatus } from '@/config/prisma/generated/client';
 
 export const validatorUserDataBody = validateInput();
 
@@ -30,6 +31,10 @@ export const UserSchema = {
 			.max(36, 'La contraseña no debe exceder los 36 caracteres')
 			.nonempty({ error: 'La contraseña no debe estar vacía' }),
 	}),
+
+	updateStatus: validatorUserDataBody.object({
+		account_status: validatorUserDataBody.nativeEnum(UserStatus),
+	}),
 };
 
 export const UserSwaggerSchemas = {
@@ -52,6 +57,12 @@ export const UserSwaggerSchemas = {
 				description: 'Role assigned to the user',
 				default: 'ADMIN',
 				example: 'ADMIN',
+			},
+			account_status: {
+				type: 'string',
+				description: 'Account status of the user',
+				default: 'ACTIVATED',
+				example: 'ACTIVATED',
 			},
 			created_at: {
 				type: 'string',

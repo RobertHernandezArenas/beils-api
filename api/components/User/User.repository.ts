@@ -24,6 +24,16 @@ export class UserRepository {
 		return prismaClient.user.update({ where: { user_id }, data });
 	}
 
+	async updateStatus(
+		user_id: string,
+		account_status: UserStatus,
+	): Promise<User> {
+		return prismaClient.user.update({
+			where: { user_id },
+			data: { account_status },
+		});
+	}
+
 	async delete(user_id: string): Promise<User> {
 		return prismaClient.user.delete({ where: { user_id } });
 	}

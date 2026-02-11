@@ -1,10 +1,29 @@
 import { userController } from './User.controller';
 import { userService } from './User.service';
 import { Request, Response } from 'express';
-// Use unknown cast first to avoid conflict with jest.Mocked
-const mockUserService = userService as unknown as jest.Mocked<
-	typeof userService
->;
+
+// Mock Prisma Client
+jest.mock('../../config/prisma/generated/client', () => ({
+	Prisma: {},
+	Role: {
+		ADMIN: 'ADMIN',
+		USER: 'USER',
+	},
+	UserStatus: {
+		ACTIVATED: 'ACTIVATED',
+		DEACTIVATED: 'DEACTIVATED',
+	},
+}));
+
+// Mock logger
+jest.mock('../../utils/logger', () => ({
+	buildLogger: jest.fn(() => ({
+		error: jest.fn(),
+		info: jest.fn(),
+		log: jest.fn(),
+		warn: jest.fn(),
+	})),
+}));
 
 // Mock del Servicio
 jest.mock('./User.service', () => ({
@@ -13,6 +32,7 @@ jest.mock('./User.service', () => ({
 		findAll: jest.fn(),
 		findById: jest.fn(),
 		update: jest.fn(),
+		updateStatus: jest.fn(),
 		delete: jest.fn(),
 		login: jest.fn(),
 	},
@@ -48,10 +68,7 @@ describe('UserController', () => {
 			};
 			const mockUser = { user_id: '1', ...req.body };
 
-			// Ahora tenemos intellisense completo y validación de tipos
-			mockUserService.create.mockResolvedValue(mockUser as any);
-			// as any en el retorno porque el User de Prisma tiene muchas props
-			// pero podríamos hacer un helper mockUser(mockUser) similar al del service test
+			(userService.create as jest.Mock).mockResolvedValue(mockUser);
 
 			await userController.create(req as Request, res as Response, next);
 
@@ -65,7 +82,7 @@ describe('UserController', () => {
 		it('debería llamar a next con error si falla servico', async () => {
 			req.body = { email: 'fail@test.com', password: 'password123' };
 			const error = new Error('Service Error');
-			mockUserService.create.mockRejectedValue(error);
+			(userService.create as jest.Mock).mockRejectedValue(error);
 
 			await userController.create(req as Request, res as Response, next);
 
@@ -81,7 +98,7 @@ describe('UserController', () => {
 				token: 'abc',
 			};
 
-			mockUserService.login.mockResolvedValue(mockResult as any);
+			(userService.login as jest.Mock).mockResolvedValue(mockResult);
 
 			await userController.login(req as Request, res as Response, next);
 
@@ -97,7 +114,7 @@ describe('UserController', () => {
 		it('debería retornar 200 y usuario', async () => {
 			req.params = { id: '1' };
 			const mockUser = { user_id: '1', email: 'test@test.com' };
-			mockUserService.findById.mockResolvedValue(mockUser as any);
+			(userService.findById as jest.Mock).mockResolvedValue(mockUser);
 
 			await userController.findById(
 				req as Request,
@@ -110,10 +127,32 @@ describe('UserController', () => {
 		});
 	});
 
+	describe('updateStatus', () => {
+		it('debería retornar 200 y usuario actualizado', async () => {
+			req.params = { user_id: '1' };
+			req.body = { account_status: 'DEACTIVATED' };
+			const mockUser = { user_id: '1', account_status: 'DEACTIVATED' };
+
+			(userService.updateStatus as jest.Mock).mockResolvedValue(mockUser);
+
+			await userController.updateStatus(
+				req as Request,
+				res as Response,
+				next,
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({
+				data: mockUser,
+				message: 'Estado de usuario actualizado correctamente',
+			});
+		});
+	});
+
 	describe('delete', () => {
 		it('debería retornar 204 y sin contenido', async () => {
-			req.params = { id: '1' };
-			mockUserService.delete.mockResolvedValue(undefined);
+			req.params = { user_id: '1' };
+			(userService.delete as jest.Mock).mockResolvedValue(undefined);
 
 			await userController.delete(req as Request, res as Response, next);
 

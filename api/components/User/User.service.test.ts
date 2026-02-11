@@ -19,7 +19,7 @@ interface User {
 	email: string;
 	password: string;
 	role: any;
-	is_active: boolean;
+	account_status: any;
 	created_at: Date;
 	updated_at: Date;
 }
@@ -30,7 +30,7 @@ const mockUser = (data: Partial<User>): any =>
 		email: 'default@test.com',
 		password: 'hashed_password',
 		role: 'ADMIN',
-		is_active: true,
+		account_status: 'ACTIVATED',
 		created_at: new Date(),
 		updated_at: new Date(),
 		...data,
@@ -46,6 +46,7 @@ jest.mock('./User.repository', () => {
 				findById: jest.fn(),
 				findAll: jest.fn(),
 				update: jest.fn(),
+				updateStatus: jest.fn(),
 				delete: jest.fn(),
 			};
 		}),
@@ -270,6 +271,42 @@ describe('UserService', () => {
 		it('debería lanzar error al intentar borrar usuario inexistente', async () => {
 			mockRepo.findById.mockResolvedValue(null);
 			await expect(service.delete('999')).rejects.toThrow();
+		});
+	});
+
+	describe('updateStatus', () => {
+		it('debería actualizar el estado del usuario', async () => {
+			const userId = '1';
+			const statusDto = { account_status: 'DEACTIVATED' as const };
+			const existingUser = mockUser({
+				user_id: '1',
+				account_status: 'ACTIVATED',
+			});
+
+			mockRepo.findById.mockResolvedValue(existingUser);
+			mockRepo.updateStatus.mockResolvedValue(
+				mockUser({
+					user_id: '1',
+					account_status: 'DEACTIVATED',
+				}),
+			);
+
+			const result = await service.updateStatus(userId, statusDto);
+
+			expect(mockRepo.updateStatus).toHaveBeenCalledWith(
+				userId,
+				'DEACTIVATED',
+			);
+			expect(result.account_status).toBe('DEACTIVATED');
+		});
+
+		it('debería lanzar error si el usuario no existe', async () => {
+			mockRepo.findById.mockResolvedValue(null);
+			await expect(
+				service.updateStatus('999', {
+					account_status: 'ACTIVATED',
+				}),
+			).rejects.toThrow();
 		});
 	});
 });

@@ -57,6 +57,14 @@ export class UserService {
 		return this.userRepository.update(user_id, updateData);
 	}
 
+	async updateStatus(
+		user_id: string,
+		data: UserDTO['updateStatus'],
+	): Promise<User> {
+		await this.findById(user_id); // Ensure exists
+		return this.userRepository.updateStatus(user_id, data.account_status);
+	}
+
 	async delete(user_id: string): Promise<void> {
 		await this.findById(user_id); // Ensure exists
 		await this.userRepository.delete(user_id);
